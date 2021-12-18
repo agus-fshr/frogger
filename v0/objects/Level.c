@@ -96,6 +96,7 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
             Frog_move(level->frog, SPAWN_X, SPAWN_Y);
         }
     }
+    /*
     if(car_collision) {
         sound_play(SFX_SQUASH, volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     } else if(log_collision) {
@@ -103,6 +104,7 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
     } else if(finisher_collision) {
         sound_play(SFX_SQUASH, volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
+    */
     /*
     for(int i = 0; i < LVL_FINISHSPOTS; i++) {
         printf("%d ", level->finishers[i]);

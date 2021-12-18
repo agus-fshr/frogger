@@ -91,6 +91,10 @@ void process_pause_state(engineptr_t eng, input_t input) {
             break;
             
         default:
+            if(eng->playstate == PLAY_STA_INIT) {
+                Level_reset(eng->level);
+                eng->score = 0;
+            }
             break;
     }
 }
@@ -120,6 +124,7 @@ void process_death_state(engineptr_t eng, input_t input) {
 }
 
 void process_play_state(engineptr_t eng, input_t input) {
+    uint8_t i;
     switch(input) {
         case INPUT_UP:
             if(eng->level->frog->lane >= 1)
@@ -158,9 +163,15 @@ void process_play_state(engineptr_t eng, input_t input) {
             break;
             
         default:
+            for(i = 0; i < LEVEL_HEIGHT; i++) {
+                Lane_tick(eng->level->lanes[i]);
+            }
             break;
     }
-    if(eng->playstate == PLAY_STA_INIT) eng->playstate = PLAY_STA_1;
+    if(eng->playstate == PLAY_STA_INIT) {
+        eng->playstate = PLAY_STA_1;
+        Level_reset(eng->level);
+    }
     if(eng->level->frog->lives == 0) {
         eng->state = GAME_STA_DEATH;
         eng->deathstate = DEATH_STA_MENU_OP_1;
@@ -168,7 +179,7 @@ void process_play_state(engineptr_t eng, input_t input) {
 }
 
 void engine_destroy_wrapper(engineptr_t eng) {
-    eng->destroy(eng, NULL);
+    eng->destroy(eng);
     Level_delete(eng->level);
     free(eng);
 }
@@ -178,4 +189,5 @@ void engine_init_wrapper(engineptr_t eng) {
     eng->level = malloc(sizeof(level_t));
     Level_init(eng->level);
     Level_reset(eng->level);
+    eng->init(eng);
 }

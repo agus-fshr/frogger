@@ -17,9 +17,8 @@
 
 #define DEADZONE (90)
 
-int LEDMatEngine_init(engineptr_t, void*);
-int LEDMatEngine_render(engineptr_t, void*);
-int LEDMatEngine_destroy(engineptr_t, void*);
-int LEDMatEngine_input(engineptr_t, void*);
+int LEDMatEngine_init(engineptr_t);
+int LEDMatEngine_destroy(engineptr_t);
+int LEDMatEngine_gameloop(engineptr_t);
 
 #endif

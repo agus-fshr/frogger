@@ -59,17 +59,12 @@ struct engineT;
 
 typedef struct engineT engine_t;
 
-typedef int (*engine_fun_ptr_t)(engine_t* engine, void* param);
+typedef int (*engine_fun_ptr_t)(engine_t* engine);
 
 struct engineT {
-    //int (*init)(void* eng, void* p);
     engine_fun_ptr_t init;
-    //void (*render)(void* eng);
-    engine_fun_ptr_t render;
-    //int (*destroy)();
     engine_fun_ptr_t destroy;
-    //int (*process_input)(void* eng, void* q);
-    engine_fun_ptr_t process_input;
+    engine_fun_ptr_t gameloop;
     levelptr_t level;
     uint32_t score;
     float volume;

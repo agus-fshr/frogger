@@ -17,9 +17,9 @@
 
 #define SPAWN_X (LEVEL_WIDTH*BLOCK_WIDTH/2)
 #define SPAWN_Y (15)
-//a
-int AllegroEngine_init(engineptr_t, void*);
-int AllegroEngine_render(engineptr_t, void*);
-int AllegroEngine_destroy(engineptr_t, void*);
-int AllegroEngine_input(engineptr_t, void*);
+
+int AllegroEngine_init(engineptr_t);
+int AllegroEngine_destroy(engineptr_t);
+int AllegroEngine_gameloop(engineptr_t);
+
 #endif

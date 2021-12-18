@@ -4,10 +4,12 @@ static void render_map(levelptr_t level);
 static void render_pause(engineptr_t eng);
 static void render_menu(engineptr_t eng);
 static void render_death(engineptr_t eng);
+static void LEDMatEngine_render(engineptr_t eng);
+static void LEDMatEngine_input(engineptr_t eng);
 
 static dcoord_t dcoord;
 
-int LEDMatEngine_init(engineptr_t eng, void* param) {
+int LEDMatEngine_init(engineptr_t eng) {
     joy_init();
     disp_init();
     dcoord.x = 0;
@@ -15,11 +17,33 @@ int LEDMatEngine_init(engineptr_t eng, void* param) {
     return 0;
 }
 
-int LEDMatEngine_destroy(engineptr_t eng, void* param){
+int LEDMatEngine_destroy(engineptr_t eng){
     return 0;
 }
 
-int LEDMatEngine_render(engineptr_t eng, void* param) {
+int LEDMatEngine_gameloop(engineptr_t eng) {
+    process_game_state(eng, INPUT_NULL);
+
+    if(eng->state == GAME_STA_EXIT) {
+        return 1;
+    }
+    laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
+    if(lane->type == MOB_LOG) {
+        int16_t newx = eng->level->frog->x + lane->step;
+        if((newx > 0) && (newx+BLOCK_WIDTH < BLOCK_WIDTH*LEVEL_WIDTH)) {
+            eng->level->frog->x = newx;
+        } else {
+            if(newx < 0) eng->level->frog->x = 0;
+            else eng->level->frog->x = (LEVEL_WIDTH - 1)*BLOCK_WIDTH;
+        }
+    }
+    LEDMatEngine_input(eng);
+    LEDMatEngine_render(eng);
+    eng->score += Level_process_collisions(eng->level, eng->volume);
+    sleep(100);
+}
+
+static void LEDMatEngine_render(engineptr_t eng) {
     disp_clear();
     switch(eng->state) {
         case GAME_STA_MENU:
@@ -39,10 +63,9 @@ int LEDMatEngine_render(engineptr_t eng, void* param) {
             break;
     }
     disp_update();
-    return 0;
 }
 
-int LEDMatEngine_input(engineptr_t eng, void* param) {
+static void LEDMatEngine_input(engineptr_t eng) {
     levelptr_t level = eng->level;
     joy_update();
     jcoord_t coord = joy_get_coord();
@@ -68,8 +91,6 @@ int LEDMatEngine_input(engineptr_t eng, void* param) {
     if(joyup || joydown || joyleft || joyright) {
         sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
-
-    return 0;
 }
 
 static void render_pause(engineptr_t eng) {

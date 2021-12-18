@@ -8,30 +8,112 @@ static void render_death(engineptr_t eng);
 static void render_street_lane(levelptr_t level, uint8_t lanenum);
 static void render_water_lane(levelptr_t level, uint8_t lanenum);
 static void draw_score(uint32_t score);
+static void AllegroEngine_input(engineptr_t eng, int key);
+static void AllegroEngine_render(engineptr_t eng);
 
 static ALLEGRO_DISPLAY* disp;
 static ALLEGRO_BITMAP* bitmap;
+static ALLEGRO_TIMER* timer;
+static ALLEGRO_EVENT_QUEUE* queue;
+static ALLEGRO_SAMPLE_ID background_music;
 
-int AllegroEngine_init(engineptr_t eng, void* param) {
+int AllegroEngine_init(engineptr_t eng) {
+    al_init();
+    al_install_keyboard();
+    timer = al_create_timer(TIMEBASE);
+    queue = al_create_event_queue();
+    
+    sound_init();
+
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_VIDEO_BITMAP);
+    
     al_init_ttf_addon();
+    al_init_primitives_addon();
+    al_init_image_addon();
+
     al_set_new_display_flags(ALLEGRO_FRAMELESS);
     disp = al_create_display(DISP_WIDTH, DISP_HEIGHT);
-    al_register_event_source((ALLEGRO_EVENT_QUEUE*) param, al_get_display_event_source(disp));
+    al_register_event_source(queue, al_get_display_event_source(disp));
     Frog_move(eng->level->frog, SPAWN_X, SPAWN_Y);
     Frog_reset_lives(eng->level->frog);
-    return al_init_image_addon();
+
+    al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+    
+    al_start_timer(timer);
+
+    sound_play(SFX_JINGLE, eng->volume, ALLEGRO_PLAYMODE_LOOP, &background_music);
 }
 
-int AllegroEngine_destroy(engineptr_t eng, void* param){
+int AllegroEngine_destroy(engineptr_t eng){
     //al_destroy_bitmap(bitmap);
     al_destroy_display(disp);
+    sound_destroy();
+    al_destroy_timer(timer);
+    al_destroy_event_queue(queue);
     return 0;
 }
 
-int AllegroEngine_render(engineptr_t eng, void* param) {
+int AllegroEngine_gameloop(engineptr_t eng) {
+    static ALLEGRO_EVENT event;
+    static uint8_t redraw = 0;
+
+    al_wait_for_event(queue, &event);
+    uint8_t i;
+    switch(event.type)
+    {
+        case ALLEGRO_EVENT_TIMER:
+            process_game_state(eng, INPUT_NULL);
+            
+            if(eng->state == GAME_STA_EXIT) {
+                return 1;
+            }
+            
+            laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
+            if(lane->type == MOB_LOG) {
+                int16_t newx = eng->level->frog->x + lane->step;
+                if((newx > 0) && (newx+64 < 64*LEVEL_WIDTH)) {
+                    eng->level->frog->x = newx;
+                } else {
+                    if(newx < 0) eng->level->frog->x = 0;
+                    else eng->level->frog->x = (LEVEL_WIDTH - 1)*64;
+                }
+            }
+            
+            if(&background_music) {
+                ALLEGRO_SAMPLE_INSTANCE* bgmusic_ins = al_lock_sample_id(&background_music);
+                al_set_sample_instance_gain(bgmusic_ins, eng->volume);
+                al_unlock_sample_id(&background_music);
+            }
+            
+            redraw = 1;
+            break;
+    
+        case ALLEGRO_EVENT_KEY_DOWN:
+            AllegroEngine_input(eng, event.keyboard.keycode);
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_CLOSE:
+            return 1;
+    }
+
+    // BUG: si apretas rapido no analiza colisiones
+    // SOLUCIONADO: no se como tampoco, pero bueno pero es ser de boca
+    if(redraw && al_is_event_queue_empty(queue))
+    {
+        AllegroEngine_render(eng);
+        //printf("%d\n", level->frog->lives);
+        //printf("%d\n", level->number);
+        /*done = */
+        eng->score += Level_process_collisions(eng->level, eng->volume);
+        redraw = 0;
+    }
+    return 0;
+}
+
+static void AllegroEngine_render(engineptr_t eng) {
     switch(eng->state) {
         case GAME_STA_MENU:
             render_menu(eng);
@@ -51,11 +133,9 @@ int AllegroEngine_render(engineptr_t eng, void* param) {
             break;
     }
     al_flip_display();
-    return 0;
 }
 
-int AllegroEngine_input(engineptr_t eng, void* keycode) {
-    int key = *((int*) keycode);
+static void AllegroEngine_input(engineptr_t eng, int key) {
     levelptr_t level = eng->level;
 
     switch(key) {
@@ -80,10 +160,6 @@ int AllegroEngine_input(engineptr_t eng, void* keycode) {
             process_game_state(eng, INPUT_ENTER);
             break;
         
-        case ALLEGRO_KEY_ESCAPE:
-            return 1;
-            break;
-        
         #ifdef CHEAT
             case ALLEGRO_KEY_B:
                 level->number -= 2;
@@ -105,8 +181,6 @@ int AllegroEngine_input(engineptr_t eng, void* keycode) {
             key == ALLEGRO_KEY_RIGHT) {
         sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
-    
-    return 0;
 }
 
 static void render_pause(engineptr_t eng) {
