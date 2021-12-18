@@ -17,6 +17,8 @@
         "allegro_primitives.h": "c",
         "allegro_font.h": "c",
         "level.h": "c",
-        "gameengine.h": "c"
+        "gameengine.h": "c",
+        "disdrv.h": "c",
+        "joydrv.h": "c"
     }
 }

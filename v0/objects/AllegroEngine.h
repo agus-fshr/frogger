@@ -3,12 +3,12 @@
 
 #include "GameEngine.h"
 #include "../config.h"
+#include "../libs/sound.h"
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_ttf.h>
-#include "../libs/sound.h"
 
 #define BLOCK_HEIGHT (64)
 #define BLOCK_WIDTH  (64)

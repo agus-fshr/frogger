@@ -17,5 +17,8 @@ typedef struct {
 typedef lane_t * laneptr_t; 
 
 void Lane_tick(laneptr_t lane);
+int16_t Lane_get_elem_x(laneptr_t lane, int8_t elem);
+int16_t Lane_get_elem_x_end(laneptr_t lane, int8_t elem);
+
 
 #endif

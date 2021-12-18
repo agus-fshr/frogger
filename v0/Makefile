@@ -1,7 +1,7 @@
-frogger: main.o Frog.o Level.o Lane.o AllegroEngine.o sound.o GameEngine.o
-	gcc main.o Frog.o Level.o Lane.o AllegroEngine.o sound.o GameEngine.o -o frogger `pkg-config allegro-5 allegro_font-5 allegro_primitives-5 allegro_audio-5 allegro_acodec-5 allegro_image-5 allegro_ttf-5 --libs --cflags` -g
+frogger: mainAllegro.o Frog.o Level.o Lane.o AllegroEngine.o sound.o GameEngine.o
+	gcc mainAllegro.o Frog.o Level.o Lane.o AllegroEngine.o sound.o GameEngine.o -o frogger `pkg-config allegro-5 allegro_font-5 allegro_primitives-5 allegro_audio-5 allegro_acodec-5 allegro_image-5 allegro_ttf-5 --libs --cflags` -g
 
-main.o: main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h libs/sound.h
+mainAllegro.o: main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h libs/sound.h
 	gcc -c main.c -o main.o -D ALLEGRO
 
 Frog.o: objects/Frog.c objects/Frog.h libs/position.h
