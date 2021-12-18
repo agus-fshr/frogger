@@ -124,14 +124,11 @@ static void render_map(levelptr_t level) {
     
     uint16_t frogx = level->frog->x;
     uint16_t frogy = level->frog->lane;
-    bitmap = al_load_bitmap("sprites/frog_64.png");
+    dcoord.x = frogx;
+    dcoord.y = frogy;
 
-    /*al_draw_filled_rectangle(frogx, frogy*BLOCK_WIDTH, frogx + BLOCK_WIDTH, (frogy + 1)*BLOCK_HEIGHT, 
-                            al_map_rgb(0, 255, 0));
-                            */
-    al_draw_bitmap(bitmap, frogx, frogy*BLOCK_HEIGHT, 0);
-    al_destroy_bitmap(bitmap);
-
+    disp_write(dcoord, D_ON);
+    /*
     laneptr_t finisherlane = level->lanes[0];
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
         al_draw_filled_rectangle(
@@ -141,5 +138,6 @@ static void render_map(levelptr_t level) {
             BLOCK_HEIGHT,
             al_map_rgb(255, 255, 0)); 
     }
+    */
 
 }
