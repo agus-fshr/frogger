@@ -6,22 +6,23 @@
 #include "objects/GameEngine.h"
 #include <time.h>
 
-#define INIT_FUN (NULL)
-#define GAME_FUN (NULL)
-#define DESTROY_FUN (NULL)
 
 #ifdef LEDMAT
     #include "objects/LEDMatrixEngine.h"
     #define INIT_FUN (&LEDMatEngine_init)
     #define GAME_FUN (&LEDMatEngine_gameloop)
     #define DESTROY_FUN (&LEDMatEngine_destroy)
-    
-#endif
-#ifdef ALLEGRO
-    #include "objects/AllegroEngine.h"
-    #define INIT_FUN (&AllegroEngine_init)
-    #define GAME_FUN (&AllegroEngine_gameloop)
-    #define DESTROY_FUN (&AllegroEngine_destroy)
+#else
+    #ifdef ALLEGRO
+        #include "objects/AllegroEngine.h"
+        #define INIT_FUN (&AllegroEngine_init)
+        #define GAME_FUN (&AllegroEngine_gameloop)
+        #define DESTROY_FUN (&AllegroEngine_destroy)
+    #else
+        #define INIT_FUN (NULL)
+        #define GAME_FUN (NULL)
+        #define DESTROY_FUN (NULL)
+    #endif
 #endif
 
 

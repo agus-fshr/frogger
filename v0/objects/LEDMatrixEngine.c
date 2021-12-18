@@ -6,9 +6,15 @@ static void render_menu(engineptr_t eng);
 static void render_death(engineptr_t eng);
 static void LEDMatEngine_render(engineptr_t eng);
 static void LEDMatEngine_input(engineptr_t eng);
+static void disp_write_sanitized(dcoord_t coord, dlevel_t val);
 
 static dcoord_t dcoord;
 
+static void disp_write_sanitized(dcoord_t coord, dlevel_t val) {
+    if(coord.x < DISP_MAX_X && coord.y < DISP_MAX_Y) {
+        disp_write_sanitized(coord, val);
+    }
+}
 int LEDMatEngine_init(engineptr_t eng) {
     joy_init();
     disp_init();
@@ -97,17 +103,17 @@ static void LEDMatEngine_input(engineptr_t eng) {
 static void render_pause(engineptr_t eng) {
     dcoord.x = 0;
     dcoord.y = eng->pausestate;
-    disp_write(dcoord, D_ON);
+    disp_write_sanitized(dcoord, D_ON);
 }
 static void render_menu(engineptr_t eng) {
     dcoord.x = 0;
     dcoord.y = eng->menustate;
-    disp_write(dcoord, D_ON);
+    disp_write_sanitized(dcoord, D_ON);
 }
 static void render_death(engineptr_t eng) {
     dcoord.x = 0;
     dcoord.y = eng->deathstate;
-    disp_write(dcoord, D_ON);
+    disp_write_sanitized(dcoord, D_ON);
 }
 static void render_map(levelptr_t level) {
     int16_t i=0, p=0, x=0;
@@ -121,23 +127,23 @@ static void render_map(levelptr_t level) {
                 if(lane->type == MOB_CAR) {
                     dcoord.x = Lane_get_elem_x(lane, p);
                     while(dcoord.x < Lane_get_elem_x_end(lane, p)){
-                        disp_write(dcoord, D_ON);
+                        disp_write_sanitized(dcoord, D_ON);
                         dcoord.x += BLOCK_WIDTH;
                     }
                 } else if(lane->type == MOB_LOG) {
                     dcoord.x = 0;
                     while(dcoord.x < DISP_WIDTH) {
-                        disp_write(dcoord, D_ON);
+                        disp_write_sanitized(dcoord, D_ON);
                         dcoord.x += BLOCK_WIDTH;
                     }
                     dcoord.x = Lane_get_elem_x(lane, p);
                     while(dcoord.x < Lane_get_elem_x_end(lane, p)){
-                        disp_write(dcoord, D_OFF);
+                        disp_write_sanitized(dcoord, D_OFF);
                         dcoord.x += BLOCK_WIDTH;
                     }
                 } else if(lane->type == MOB_FINISH) {
                     dcoord.x = Lane_get_elem_x(lane, p);
-                    disp_write(dcoord, D_ON);
+                    disp_write_sanitized(dcoord, D_ON);
                 }
             }
         }
@@ -149,7 +155,7 @@ static void render_map(levelptr_t level) {
     dcoord.x = frogx;
     dcoord.y = frogy;
 
-    disp_write(dcoord, D_ON);
+    disp_write_sanitized(dcoord, D_ON);
     /*
     laneptr_t finisherlane = level->lanes[0];
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
