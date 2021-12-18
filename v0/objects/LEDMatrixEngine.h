@@ -3,7 +3,6 @@
 
 #include "GameEngine.h"
 #include "../config.h"
-#include "../libs/sound.h"
 #include "../libs/joydisp/joydrv.h"
 #include "../libs/joydisp/disdrv.h"
 
