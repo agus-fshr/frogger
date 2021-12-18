@@ -40,7 +40,8 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     LEDMatEngine_input(eng);
     LEDMatEngine_render(eng);
     eng->score += Level_process_collisions(eng->level, eng->volume);
-    sleep(100);
+    //sleep(100);
+    return 1;
 }
 
 static void LEDMatEngine_render(engineptr_t eng) {
@@ -89,7 +90,7 @@ static void LEDMatEngine_input(engineptr_t eng) {
         process_game_state(eng, INPUT_ENTER);
         
     if(joyup || joydown || joyleft || joyright) {
-        sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
+        //sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
 }
 
