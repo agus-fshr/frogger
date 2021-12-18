@@ -1,7 +1,6 @@
 #ifndef __GAME_ENGINE_H
 #define __GAME_ENGINE_H
 #include "Level.h"
-#include <allegro5/allegro5.h>
 
 
 typedef enum {
