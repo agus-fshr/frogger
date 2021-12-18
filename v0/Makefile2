@@ -1,8 +1,8 @@
 frogger: main.o Frog.o Level.o Lane.o LEDMatrixEngine.o sound.o GameEngine.o
-	gcc main.o Frog.o Level.o Lane.o LEDMatrixEngine.o sound.o GameEngine.o libs/joydisp/disdrv.o libs/joydisp/joydrv.o -o frogger `pkg-config allegro-5 allegro_font-5 allegro_primitives-5 allegro_audio-5 allegro_acodec-5 allegro_image-5 allegro_ttf-5 --libs --cflags` -g
+	gcc main.o Frog.o Level.o Lane.o LEDMatrixEngine.o sound.o GameEngine.o libs/joydisp/disdrv.o libs/joydisp/joydrv.o -o frogger -g
 
-mainAllegro.o: main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h libs/sound.h
-	gcc -c main.c -o main.o -D ALLEGRO
+mainLED.o: main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h
+	gcc -c main.c -o main.o -D LEDMAT
 
 Frog.o: objects/Frog.c objects/Frog.h libs/position.h
 	gcc -c objects/Frog.c -o Frog.o
@@ -13,14 +13,11 @@ Lane.o: objects/Lane.c objects/Lane.h
 Level.o: objects/Level.c objects/Level.h objects/Frog.h objects/Lane.h config.h
 	gcc -c objects/Level.c -o Level.o
 
-LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h libs/sound.h objects/GameEngine.h
+LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h
 	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o
 
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
 	gcc -c objects/GameEngine.c -o GameEngine.o
-
-sound.o: libs/sound.c libs/sound.h
-	gcc -c libs/sound.c -o sound.o
 
 clean:
 	rm *.o

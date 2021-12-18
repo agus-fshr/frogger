@@ -74,14 +74,14 @@ int AllegroEngine_gameloop(engineptr_t eng) {
             laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
             if(lane->type == MOB_LOG) {
                 int16_t newx = eng->level->frog->x + lane->step;
-                if((newx > 0) && (newx+64 < 64*LEVEL_WIDTH)) {
+                if((newx > 0) && (newx+BLOCK_WIDTH < BLOCK_WIDTH*LEVEL_WIDTH)) {
                     eng->level->frog->x = newx;
                 } else {
                     if(newx < 0) eng->level->frog->x = 0;
-                    else eng->level->frog->x = (LEVEL_WIDTH - 1)*64;
+                    else eng->level->frog->x = (LEVEL_WIDTH - 1)*BLOCK_WIDTH;
                 }
             }
-            
+
             if(&background_music) {
                 ALLEGRO_SAMPLE_INSTANCE* bgmusic_ins = al_lock_sample_id(&background_music);
                 al_set_sample_instance_gain(bgmusic_ins, eng->volume);
