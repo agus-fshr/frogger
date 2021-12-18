@@ -8,10 +8,10 @@ Frog.o: objects/Frog.c objects/Frog.h libs/position.h
 	gcc -c objects/Frog.c -o Frog.o
 
 Lane.o: objects/Lane.c objects/Lane.h
-	gcc -c objects/Lane.c -o Lane.o
+	gcc -c objects/Lane.c -o Lane.o -D ALLEGRO
 
 Level.o: objects/Level.c objects/Level.h objects/Frog.h objects/Lane.h config.h
-	gcc -c objects/Level.c -o Level.o
+	gcc -c objects/Level.c -o Level.o -D ALLEGRO
 
 AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/sound.h objects/GameEngine.h
 	gcc -c objects/AllegroEngine.c -o AllegroEngine.o
