@@ -56,7 +56,7 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     LEDMatEngine_render(eng);
     eng->score += Level_process_collisions(eng->level, eng->volume);
     
-    usleep(1000000);
+    usleep(1000000/60);
     
     return 0;
 }
@@ -146,6 +146,7 @@ static void render_map(levelptr_t level) {
                 
                 if(lane->type == MOB_CAR) {
                     dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
+                    printf("%d %d\n", Lane_get_elem_x(lane, p), dcoord.x);
                     uint8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
                     while(dcoord.x < limit_x){
                         disp_write_sanitized(dcoord, D_ON);
