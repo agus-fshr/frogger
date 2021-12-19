@@ -78,13 +78,13 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     
     process_game_state(eng, system_input);
 
-    //printf("%d %d %d %d %d\n", eng->state, eng->playstate, eng->pausestate, eng->menustate, eng->deathstate);
-    if(eng->state == GAME_STA_EXIT) {
-        return 1;
-    }
 
     //LEDMatEngine_input(eng);
     LEDMatEngine_render(eng);
+    
+    if(eng->state == GAME_STA_EXIT) {
+        return 1;
+    }
     
     //printf("%d\n", eng->score);
     usleep(1000000*TIMEBASE);
