@@ -85,7 +85,7 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     if(eng->state == GAME_STA_EXIT) {
         return 1;
     }
-    
+
     //printf("%d\n", eng->score);
     usleep(1000000*TIMEBASE);
     
@@ -119,8 +119,11 @@ static void LEDMatEngine_render(engineptr_t eng) {
         case GAME_STA_DEATH:
             render_death(eng);
             break;
+
         case GAME_STA_EXIT:
             render_exit(eng);
+            break;
+
         default:
             break;
     }
@@ -221,6 +224,7 @@ static void render_exit(engineptr_t eng) {
     dcoord.x = CENTERED_TEXT_X;
     dcoord.y = CENTERED_TEXT_Y;
     write_word("BYE", dcoord, 3);
+    disp_update();
     usleep(2000000);
     disp_clear();
 }
