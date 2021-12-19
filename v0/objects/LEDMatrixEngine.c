@@ -73,7 +73,6 @@ int LEDMatEngine_destroy(engineptr_t eng){
 }
 
 int LEDMatEngine_gameloop(engineptr_t eng) {
-    uint8_t i = 0;
     input_t system_input = LEDMatEngine_input(eng);
     
     process_game_state(eng, system_input);
@@ -119,6 +118,9 @@ static void LEDMatEngine_render(engineptr_t eng) {
         case GAME_STA_DEATH:
             render_death(eng);
             break;
+        case GAME_STA_EXIT:
+        default:
+            break;
     }
     disp_update();
 }
@@ -128,7 +130,6 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
     static input_t last_input = INPUT_NULL;
     static jswitch_t last_switch = J_NOPRESS;
 
-    levelptr_t level = eng->level;
     joy_update();
     jcoord_t coord = joy_get_coord();
     jswitch_t sw = joy_get_switch();
@@ -217,7 +218,7 @@ static void render_death(engineptr_t eng) {
 static void render_map(levelptr_t level) {
     static uint8_t flicker = 0;
 
-    int16_t i=0, p=0, x=0;
+    int16_t i=0, p=0;
     for(i = 0; i < LEVEL_HEIGHT; i++) {
         laneptr_t lane = level->lanes[i];
         dcoord.y = i;
