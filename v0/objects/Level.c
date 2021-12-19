@@ -1,12 +1,6 @@
 #include "Level.h"
 #include<stdio.h>
 
-#ifdef LEDMAT
-    #include "LEDMatrixEngine.h"
-#else
-    #include "AllegroEngine.h"
-#endif
-
 static int8_t gen_sign();
 static void generate_car_lane(laneptr_t lane, uint8_t diff);
 static void generate_log_lane(laneptr_t lane, uint8_t diff);
@@ -156,14 +150,14 @@ void Level_reset(levelptr_t level) {
 }
 
 static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
-    float frog_x = ((float) level->frog->x) / BLOCK_WIDTH;
+    float frog_x = ((float) level->frog->x) / REFERENCE_WIDTH;
     uint8_t frog_y = level->frog->lane;
     int8_t i = 0, p = 0; // iterator
     laneptr_t lane = level->lanes[frog_y];
     uint8_t collided = 0;
     if(lane->delta != 0) {   
         for(p = -1; p < LEVEL_WIDTH / lane->delta + 2; p++) {    
-            float start = ((float) lane->x0)/BLOCK_WIDTH + p*lane->delta;
+            float start = ((float) lane->x0)/REFERENCE_WIDTH + p*lane->delta;
             //printf("%d %f %f\n", frog_y, frog_x, start);
             if(((frog_x+1) > start) && (frog_x < (start + lane->mob_length))) {
                 *finish = p;
@@ -205,7 +199,7 @@ static void generate_log_lane(laneptr_t lane, uint8_t diff) {
     else
         lane->mob_length = 2;
     lane->delta = lane->mob_length + 2 + (rand() % 4);
-    lane->x0 = rand() % BLOCK_WIDTH;
+    lane->x0 = rand() % ((uint16_t) REFERENCE_WIDTH);
 }
 
 static void generate_floor_lane(laneptr_t lane) {
@@ -230,9 +224,9 @@ static void Level_generate(levelptr_t level) {
     for(i = 0; i < LEVEL_HEIGHT; i++) {
         if(i == 0) {
             level->lanes[0]->type = MOB_FINISH;
-            level->lanes[0]->delta = 4;
+            level->lanes[0]->delta = LEVEL_WIDTH/LVL_FINISHSPOTS;
             level->lanes[0]->step = 0;
-            level->lanes[0]->x0 = 50;
+            level->lanes[0]->x0 = REFERENCE_WIDTH * (level->lanes[0]->delta / 2);
             level->lanes[0]->mob_length = 1;
         } else if(i == 8 || i == 15) {
             generate_floor_lane(level->lanes[i]);

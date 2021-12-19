@@ -8,6 +8,7 @@ static void render_death(engineptr_t eng);
 static void LEDMatEngine_render(engineptr_t eng);
 static void LEDMatEngine_input(engineptr_t eng);
 static void disp_write_sanitized(dcoord_t coord, dlevel_t val);
+static void disp_clear_buf();
 
 static dcoord_t dcoord;
 
@@ -16,6 +17,17 @@ static void disp_write_sanitized(dcoord_t coord, dlevel_t val) {
         disp_write(coord, val);
     }
 }
+static void disp_clear_buf() {
+    uint8_t i = 0, j = 0;
+    for(i = 0; i <= DISP_MAX_X; i++) {
+        dcoord.x = i;
+        for(j = 0; j <= DISP_MAX_Y; j++) {
+            dcoord.y = j;
+            disp_write(dcoord, D_OFF);
+        }
+    }
+}
+
 int LEDMatEngine_init(engineptr_t eng) {
     joy_init();
     disp_init();
@@ -56,13 +68,14 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     LEDMatEngine_render(eng);
     eng->score += Level_process_collisions(eng->level, eng->volume);
     
-    usleep(1000000/60);
+    usleep(1000000/48);
     
     return 0;
 }
 
 static void LEDMatEngine_render(engineptr_t eng) {
-    disp_clear();
+    
+    disp_clear_buf();
     //printf("A\n");
     //printf("%d\n", eng->state);
     switch(eng->state) {
@@ -71,7 +84,15 @@ static void LEDMatEngine_render(engineptr_t eng) {
             break;
 
         case GAME_STA_PLAY:
+            
             render_map(eng->level);
+
+            //disp_clear_buf();
+            
+            //usleep(50000);
+            //disp_write_sanitized(dcoord, D_ON);
+
+
             break;
         
         case GAME_STA_PAUSE:
@@ -83,6 +104,7 @@ static void LEDMatEngine_render(engineptr_t eng) {
             break;
     }
     disp_update();
+
 }
 
 static void LEDMatEngine_input(engineptr_t eng) {
@@ -129,6 +151,8 @@ static void render_death(engineptr_t eng) {
     disp_write_sanitized(dcoord, D_ON);
 }
 static void render_map(levelptr_t level) {
+    static uint8_t flicker = 0;
+
     int16_t i=0, p=0, x=0;
     for(i = 0; i < LEVEL_HEIGHT; i++) {
         laneptr_t lane = level->lanes[i];
@@ -146,8 +170,8 @@ static void render_map(levelptr_t level) {
                 
                 if(lane->type == MOB_CAR) {
                     dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
-                    printf("%d %d\n", Lane_get_elem_x(lane, p), dcoord.x);
-                    uint8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
+                    //printf("%d %d\n", Lane_get_elem_x(lane, p), dcoord.x);
+                    int8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
                     while(dcoord.x < limit_x){
                         disp_write_sanitized(dcoord, D_ON);
                         dcoord.x += BLOCK_WIDTH;
@@ -168,12 +192,12 @@ static void render_map(levelptr_t level) {
         
     }
     
-    uint16_t frogx = scale_width(level->frog->x, BLOCK_WIDTH);
-    uint16_t frogy = level->frog->lane;
-    dcoord.x = frogx;
-    dcoord.y = frogy;
-
-    disp_write_sanitized(dcoord, D_ON);
+    if(flicker++ == 2) {
+        dcoord.x = scale_width(level->frog->x, BLOCK_WIDTH);
+        dcoord.y = level->frog->lane;
+        disp_write_sanitized(dcoord, D_ON);
+        flicker = 0;
+    }
     /*
     laneptr_t finisherlane = level->lanes[0];
     for(i = 0; i < LVL_FINISHSPOTS; i++) {

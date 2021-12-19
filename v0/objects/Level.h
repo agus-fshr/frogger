@@ -7,6 +7,8 @@
 #include"../config.h"
 
 #define REFERENCE_WIDTH (64.0)
+#define SPAWN_X (LEVEL_WIDTH*REFERENCE_WIDTH/2)
+#define SPAWN_Y (LEVEL_HEIGHT-1)
 
 typedef struct {
     uint8_t number;
