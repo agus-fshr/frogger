@@ -24,6 +24,7 @@ static void render_map(levelptr_t level);
 static void render_pause(engineptr_t eng);
 static void render_menu(engineptr_t eng);
 static void render_death(engineptr_t eng);
+static void render_exit(engineptr_t eng);
 static void LEDMatEngine_render(engineptr_t eng);
 static input_t LEDMatEngine_input(engineptr_t eng);
 static void show_menu_score(uint32_t score);
@@ -119,6 +120,7 @@ static void LEDMatEngine_render(engineptr_t eng) {
             render_death(eng);
             break;
         case GAME_STA_EXIT:
+            render_exit(eng);
         default:
             break;
     }
@@ -167,8 +169,8 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
 
 
 static void render_pause(engineptr_t eng) {
-    dcoord.x = 1;
-    dcoord.y = 6;
+    dcoord.x = CENTERED_TEXT_X;
+    dcoord.y = CENTERED_TEXT_Y;
 
     if(eng->pausestate == PAUSE_STA_OP_1) {
         write_word("RES", dcoord, 3);
@@ -185,8 +187,8 @@ static void render_pause(engineptr_t eng) {
 
 
 static void render_menu(engineptr_t eng) {
-    dcoord.x = 1;
-    dcoord.y = 6;
+    dcoord.x = CENTERED_TEXT_X;
+    dcoord.y = CENTERED_TEXT_Y;
     if(eng->menustate == MENU_STA_OP_1) {
         write_word("PLY", dcoord, 3);
     } else if(eng->menustate == MENU_STA_OP_2) {
@@ -202,8 +204,8 @@ static void render_menu(engineptr_t eng) {
 
 
 static void render_death(engineptr_t eng) {
-    dcoord.x = 1;
-    dcoord.y = 6;
+    dcoord.x = CENTERED_TEXT_X;
+    dcoord.y = CENTERED_TEXT_Y;
     if(eng->deathstate == DEATH_STA_MENU_OP_1) {
         write_word("TRY", dcoord, 3);
     } else if(eng->deathstate == DEATH_STA_MENU_OP_2) {
@@ -212,6 +214,15 @@ static void render_death(engineptr_t eng) {
 
     draw_menu_arrows();
     show_menu_score(eng->score);
+}
+
+
+static void render_exit(engineptr_t eng) {
+    dcoord.x = CENTERED_TEXT_X;
+    dcoord.y = CENTERED_TEXT_Y;
+    write_word("BYE", dcoord, 3);
+    usleep(2000000);
+    disp_clear();
 }
 
 

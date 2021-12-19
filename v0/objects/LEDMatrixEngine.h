@@ -26,6 +26,8 @@
 #define DISP_HEIGHT (BLOCK_HEIGHT * LEVEL_HEIGHT)
 #define DISP_WIDTH (BLOCK_WIDTH * LEVEL_WIDTH)
 #define DEADZONE (90)
+#define CENTERED_TEXT_X 1
+#define CENTERED_TEXT_Y 6
 
 
 /*******************************************************************************
