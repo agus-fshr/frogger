@@ -7,7 +7,9 @@ static void render_menu(engineptr_t eng);
 static void render_death(engineptr_t eng);
 static void LEDMatEngine_render(engineptr_t eng);
 static input_t LEDMatEngine_input(engineptr_t eng);
-
+static void show_menu_score(uint32_t score);
+static void draw_menu_arrows();
+static void show_menu_lives(uint8_t lives);
 
 const dlevel_t arrow_up[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_ON, D_OFF, D_OFF,
@@ -147,29 +149,9 @@ static void render_pause(engineptr_t eng) {
         write_word("EXT", dcoord, 3);
     }
 
-    dcoord.y = 0;
-    dcoord.x = 5;
-    write_bmp(arrow_up, dcoord);
-
-
-    dcoord.y = DISP_MAX_Y-4;
-    dcoord.x = 5;
-    write_bmp(arrow_down, dcoord);
-
-
-    dcoord.y = DISP_MAX_Y+1;
-    dcoord.x = DISP_MAX_X;
-    while(dcoord.y > 0) {
-        dcoord.y--;
-        disp_write_sanitized(dcoord, (eng->score >> dcoord.y) & 1 ? D_ON : D_OFF);
-    }
-
-    dcoord.y = 0;
-    dcoord.x = 0;
-    while(dcoord.y < eng->level->frog->lives) {
-        disp_write_sanitized(dcoord, D_ON);
-        dcoord.y++;
-    }
+    draw_menu_arrows();
+    show_menu_lives(eng->level->frog->lives);
+    show_menu_score(eng->score);
 }
 
 static void render_menu(engineptr_t eng) {
@@ -181,21 +163,8 @@ static void render_menu(engineptr_t eng) {
         write_word("QIT", dcoord, 3);
     }
 
-    dcoord.y = 0;
-    dcoord.x = 5;
-    write_bmp(arrow_up, dcoord);
-
-    dcoord.y = DISP_MAX_Y-4;
-    dcoord.x = 5;
-    write_bmp(arrow_down, dcoord);
-    
-    uint32_t highscore = get_highscore();
-    dcoord.y = DISP_MAX_Y;
-    dcoord.x = DISP_MAX_X;
-    while(dcoord.y > 0) {
-        disp_write_sanitized(dcoord, (highscore >> dcoord.y) & 1 ? D_ON : D_OFF);
-        dcoord.y--;
-    }
+    draw_menu_arrows();
+    show_menu_score(get_highscore());
     
     //disp_write_sanitized(dcoord, D_ON);
     //write_letter('E', dcoord);
@@ -210,22 +179,8 @@ static void render_death(engineptr_t eng) {
         write_word("EXT", dcoord, 3);
     }
 
-    dcoord.y = 0;
-    dcoord.x = 5;
-    write_bmp(arrow_up, dcoord);
-
-
-    dcoord.y = DISP_MAX_Y-4;
-    dcoord.x = 5;
-    write_bmp(arrow_down, dcoord);
-
-    
-    dcoord.y = DISP_MAX_Y;
-    dcoord.x = DISP_MAX_X;
-    while(dcoord.y > 0) {
-        disp_write_sanitized(dcoord, (eng->score >> dcoord.y) & 1 ? D_ON : D_OFF);
-        dcoord.y--;
-    }
+    draw_menu_arrows();
+    show_menu_score(eng->score);
 }
 
 static void render_map(levelptr_t level) {
@@ -278,5 +233,32 @@ static void render_map(levelptr_t level) {
         dcoord.x = scale_width(Lane_get_elem_x(finisherlane, level->finishers[i]), BLOCK_WIDTH),
         dcoord.y = 0;
         disp_write_sanitized(dcoord, D_OFF);
+    }
+}
+
+static void show_menu_score(uint32_t score) {
+    dcoord.y = DISP_MAX_Y+1;
+    dcoord.x = DISP_MAX_X;
+    while(dcoord.y > 0) {
+        dcoord.y--;
+        disp_write_sanitized(dcoord, (score >> dcoord.y) & 1 ? D_ON : D_OFF);
+    }
+}
+
+static void draw_menu_arrows() {
+    dcoord.y = 0;
+    dcoord.x = 5;
+    write_bmp(arrow_up, dcoord);
+    dcoord.y = DISP_MAX_Y-4;
+    dcoord.x = 5;
+    write_bmp(arrow_down, dcoord);
+}
+
+static void show_menu_lives(uint8_t lives) {
+    dcoord.y = 0;
+    dcoord.x = 0;
+    while(dcoord.y < lives) {
+        disp_write_sanitized(dcoord, D_ON);
+        dcoord.y++;
     }
 }

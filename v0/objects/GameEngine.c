@@ -209,7 +209,13 @@ void engine_destroy_wrapper(engineptr_t eng) {
 }
 
 void engine_init_wrapper(engineptr_t eng) {
-    highscorefile = fopen("highscore.txt", "w+");
+
+    highscorefile = fopen("highscore", "r+");
+    if(highscorefile == NULL) {
+        highscorefile = fopen("highscore", "w+");
+        fclose(highscorefile);
+        highscorefile = highscorefile = fopen("highscore", "r+");
+    }
     initialize_game_status(eng);
     eng->level = malloc(sizeof(level_t));
     Level_init(eng->level);
@@ -223,7 +229,6 @@ float scale_width(int16_t width, int16_t block_width) {
 
 void manage_score(engineptr_t eng) {
     uint32_t highscore = get_highscore();
-    eng->score = 51;
     if(eng->score > highscore) {
         fseek(highscorefile, 0, SEEK_SET);
         printf("Saving HS: %d\n", eng->score);
