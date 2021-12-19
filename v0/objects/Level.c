@@ -91,11 +91,12 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
     uint8_t car_collision = collided && level->lanes[frogy]->type == MOB_CAR;
     uint8_t log_collision = !collided && level->lanes[frogy]->type == MOB_LOG;
     uint8_t finisher_collision = !collided && level->lanes[frogy]->type == MOB_FINISH;
+    /*
     #ifdef CHEAT
         car_collision = 0;
         log_collision = 0;
     #endif
-
+    */
     if(car_collision || log_collision || finisher_collision) {
         if(Frog_kill(level->frog) == 1) {
             Frog_move(level->frog, SPAWN_X, SPAWN_Y);

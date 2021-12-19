@@ -70,6 +70,7 @@ int AllegroEngine_init(engineptr_t eng) {
     al_start_timer(timer);
 
     sound_play(SFX_JINGLE, eng->volume, ALLEGRO_PLAYMODE_LOOP, &background_music);
+    return 1;
 }
 
 
@@ -96,11 +97,10 @@ int AllegroEngine_gameloop(engineptr_t eng) {
             if(eng->state == GAME_STA_EXIT) {
                 return 1;
             }
-            if(&background_music) {
-                ALLEGRO_SAMPLE_INSTANCE* bgmusic_ins = al_lock_sample_id(&background_music);
-                al_set_sample_instance_gain(bgmusic_ins, eng->volume);
-                al_unlock_sample_id(&background_music);
-            }
+            ALLEGRO_SAMPLE_INSTANCE* bgmusic_ins = al_lock_sample_id(&background_music);
+            al_set_sample_instance_gain(bgmusic_ins, eng->volume);
+            al_unlock_sample_id(&background_music);
+            
             break;
     
         case ALLEGRO_EVENT_KEY_DOWN:
@@ -148,9 +148,12 @@ static void AllegroEngine_render(engineptr_t eng) {
 
 
 static input_t AllegroEngine_input(engineptr_t eng, int key) {
+    #ifdef CHEAT
     levelptr_t level = eng->level;
+    #endif
     switch(key) {
         #ifdef CHEAT
+            
             case ALLEGRO_KEY_B:
                 level->number -= 2;
                 Level_next(level);
@@ -274,7 +277,7 @@ static void render_death(engineptr_t eng) {
 
 static void render_map(levelptr_t level) {
     al_clear_to_color(al_map_rgb(80, 80, 255));
-    int16_t i=0, p=0, x=0;
+    int16_t i=0, p=0;
     for(i = 0; i < LEVEL_HEIGHT; i++) {
         laneptr_t lane = level->lanes[i];
         if(lane->type == MOB_CAR) {
@@ -371,7 +374,6 @@ static void render_floor_lane(levelptr_t level, uint8_t lanenum) {
 
 
 static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
-    uint8_t x = 0;
     if(lane->mob_length == 2) {
         bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
         al_draw_bitmap(

@@ -32,7 +32,6 @@ int main()
     engine->destroy = DESTROY_FUN;
     
     engine_init_wrapper(engine);
-    levelptr_t level = engine->level;
     
     while(!engine->gameloop(engine)) {}
 

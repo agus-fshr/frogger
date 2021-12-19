@@ -1,4 +1,7 @@
 machine := $(shell uname -m)
+gccflags := -Wall
+cheatflags := -D CHEAT
+
 ifeq ($(machine), armv7l)
 	target = froggerRPi
 	maintarget = mainRPi.o
@@ -17,31 +20,31 @@ $(target): $(maintarget) Frog.o Level.o Lane.o $(dep) GameEngine.o
 	gcc $(maintarget) Frog.o Level.o Lane.o $(linkedobj) GameEngine.o -o $(target)  -g
 
 $(maintarget): main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h $(dep)
-	gcc -c main.c -o $(maintarget) $(flag)
+	gcc -c main.c -o $(maintarget) $(flag) $(gccflags)
 
 Frog.o: objects/Frog.c objects/Frog.h
-	gcc -c objects/Frog.c -o Frog.o
+	gcc -c objects/Frog.c -o Frog.o $(gccflags)
 
 Lane.o: objects/Lane.c objects/Lane.h
-	gcc -c objects/Lane.c -o Lane.o $(flag)
+	gcc -c objects/Lane.c -o Lane.o $(flag) $(gccflags)
 
 Level.o: objects/Level.c objects/Level.h objects/Frog.h objects/Lane.h config.h
-	gcc -c objects/Level.c -o Level.o $(flag)
+	gcc -c objects/Level.c -o Level.o $(flag) $(gccflags)
 
 AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/sound.h objects/GameEngine.h
-	gcc -c objects/AllegroEngine.c -o AllegroEngine.o
+	gcc -c objects/AllegroEngine.c -o AllegroEngine.o $(gccflags) $(cheatflags)
 
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
-	gcc -c objects/GameEngine.c -o GameEngine.o
+	gcc -c objects/GameEngine.c -o GameEngine.o $(gccflags)
 
 LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h
-	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o
+	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o $(gccflags)
 
 LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
-	gcc -c libs/LEDlib.c -o LEDlib.o
+	gcc -c libs/LEDlib.c -o LEDlib.o $(gccflags)
 	
 sound.o: libs/sound.c libs/sound.h
-	gcc -c libs/sound.c -o sound.o
+	gcc -c libs/sound.c -o sound.o $(gccflags)
 
 clean:
 	rm *.o

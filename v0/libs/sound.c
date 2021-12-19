@@ -1,6 +1,14 @@
 #include "sound.h"
 #include <stdio.h>
 
+
+const char *sounds[] = {
+    "sfx/jingle.wav",
+    "sfx/hop.wav",
+    "sfx/squash.wav",
+    "sfx/plunk.wav"
+};
+
 void sound_init(void) {
     al_install_audio();
     al_init_acodec_addon();

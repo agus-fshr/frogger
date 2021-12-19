@@ -20,7 +20,6 @@
 typedef enum {
     GAME_STA_MENU = 1,
     GAME_STA_PLAY,
-    GAME_STA_NEW_HSCORE,
     GAME_STA_DEATH,
     GAME_STA_PAUSE,
     GAME_STA_EXIT,
