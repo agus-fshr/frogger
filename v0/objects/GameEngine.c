@@ -186,7 +186,7 @@ static void process_death_state(engineptr_t eng, input_t input) {
             break;
 
         case INPUT_ENTER:
-            if(eng->deathstate == DEATH_STA_OP_1) {
+            if(eng->deathstate == DEATH_STA_MENU_OP_1) {
                 eng->state = GAME_STA_PLAY;
                 eng->playstate = PLAY_STA_INIT;
             }
