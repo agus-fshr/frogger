@@ -1,7 +1,7 @@
 # TPFinal de Programación I
 
 ## Características de la implementación
-
+---
 - Tres vehículos diferentes (de 1, 2, y 3 bloques de longitud) (limitado por el diseño)*.
 - Diferentes longitudes de troncos flotantes (a discreción de la dificultad adecuada, no limitado por el diseño)*.
 - Generación aleatoria de niveles (modo Endless), con escalado de dificultad conforme se avanza (velocidad y longitud de elementos).
@@ -14,7 +14,7 @@
 - La base del diseño es Allegro en ambos casos de interfaz. Mediante un timer y FSMs se controla la lógica de juego, aplicando la interfaz abstracta al momento de manejar input del usuario y de graficar.
 - Puntaje multiplicado por dificultad de nivel.
 
-
 ## Problemas conocidos y/o solucionados
+---
 - Gran leak de memoria en los gráficos, solucionado con Valgrind+gdb.
 - Se conoce que hay un pequeño leak causado por el sistema de audio, ya que se debe esperar a terminar la reproducción para poder liberar la memoria ocupada por una pista. Esto no se pudo resolver ya que no se priorizó.
