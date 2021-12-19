@@ -153,7 +153,6 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
     #endif
     switch(key) {
         #ifdef CHEAT
-            
             case ALLEGRO_KEY_B:
                 level->number -= 2;
                 Level_next(level);

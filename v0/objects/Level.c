@@ -29,7 +29,7 @@ static void Level_generate(levelptr_t level);
  *******************************************************************************
  ******************************************************************************/
 uint8_t Level_init(levelptr_t level) {
-    uint8_t i = 0, p = 0;
+    uint8_t i = 0;
     
     level->finisher_count = 0;
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
@@ -70,7 +70,7 @@ uint8_t Level_init(levelptr_t level) {
 
 
 uint8_t Level_delete(levelptr_t level) {
-    uint8_t i = 0, p = 0;
+    uint8_t i = 0;
     
     for(i = 0; i < LEVEL_HEIGHT; i++) {        
         free(level->lanes[i]);
@@ -83,7 +83,6 @@ uint8_t Level_delete(levelptr_t level) {
 
 
 uint8_t Level_process_collisions(levelptr_t level, float volume) {
-    uint16_t frogx = level->frog->x;
     uint16_t frogy = level->frog->lane;
     uint8_t finish_order;
 
@@ -159,9 +158,8 @@ uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len) {
 static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
     float frog_x = ((float) level->frog->x) / REFERENCE_WIDTH;
     uint8_t frog_y = level->frog->lane;
-    int8_t i = 0, p = 0; // iterator
+    int8_t p = 0; // iterator
     laneptr_t lane = level->lanes[frog_y];
-    uint8_t collided = 0;
     if(lane->delta != 0) {   
         for(p = -1; p < LEVEL_WIDTH / lane->delta + 2; p++) {    
             float start = ((float) lane->x0)/REFERENCE_WIDTH + p*lane->delta;

@@ -19,7 +19,6 @@ static void process_menu_state(engineptr_t eng, input_t input);
 static void process_pause_state(engineptr_t eng, input_t input);
 static void process_death_state(engineptr_t eng, input_t input);
 static void process_play_state(engineptr_t eng, input_t input);
-static void process_exit_state(engineptr_t eng, input_t input);
 
 
 /*******************************************************************************
@@ -62,6 +61,7 @@ void process_game_state(engineptr_t eng, input_t input) {
             process_death_state(eng, input);
             break;
 
+        case GAME_STA_EXIT:
         default:
             break;
     }
@@ -82,7 +82,7 @@ void engine_init_wrapper(engineptr_t eng) {
     if(highscorefile == NULL) {
         highscorefile = fopen("highscore", "w+");
         fclose(highscorefile);
-        highscorefile = highscorefile = fopen("highscore", "r+");
+        highscorefile = fopen("highscore", "r+");
     }
     initialize_game_status(eng);
     eng->level = malloc(sizeof(level_t));
@@ -186,7 +186,7 @@ static void process_death_state(engineptr_t eng, input_t input) {
             break;
 
         case INPUT_ENTER:
-            if(eng->deathstate == MENU_STA_OP_1) {
+            if(eng->deathstate == DEATH_STA_OP_1) {
                 eng->state = GAME_STA_PLAY;
                 eng->playstate = PLAY_STA_INIT;
             }

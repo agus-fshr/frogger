@@ -36,17 +36,18 @@ typedef frog_t * frogptr_t;
  * @brief Resets lives to default value
  * @param frog Pointer to frog
  */ 
-uint8_t Frog_reset_lives(frogptr_t frog);
+void Frog_reset_lives(frogptr_t frog);
 
 /**
  * @brief Adds a live to the counter
  * @param frog Pointer to frog
  */ 
-uint8_t Frog_add_live(frogptr_t frog);
+void Frog_add_live(frogptr_t frog);
 
 /**
- * @brief Advances lane state
+ * @brief Subtracts 1 from lives
  * @param frog Pointer to frog
+ * @return 1 if there are remaining lives
  */ 
 uint8_t Frog_kill(frogptr_t frog);
 

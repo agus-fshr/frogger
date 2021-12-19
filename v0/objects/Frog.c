@@ -16,12 +16,12 @@
                         GLOBAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-uint8_t Frog_reset_lives(frogptr_t frog) {
+void Frog_reset_lives(frogptr_t frog) {
     frog->lives = LVL_LIVES;
 }
 
 
-uint8_t Frog_add_live(frogptr_t frog) {
+void Frog_add_live(frogptr_t frog) {
     frog->lives++;
 }
 
