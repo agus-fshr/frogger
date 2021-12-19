@@ -87,5 +87,5 @@ void process_pause_state(engineptr_t eng, input_t input);
 void process_death_state(engineptr_t eng, input_t input);
 void process_play_state(engineptr_t eng, input_t input);
 void process_exit_state(engineptr_t eng, input_t input);
-float scale_width(uint16_t width, uint16_t block_width);
+float scale_width(int16_t width, int16_t block_width);
 #endif
