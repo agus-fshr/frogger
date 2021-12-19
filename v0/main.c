@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include "config.h"
-#include <stdlib.h>
-#include "objects/Lane.h"
-#include "objects/Level.h"
 #include "objects/GameEngine.h"
-#include <time.h>
 
 
 #ifdef LEDMAT
@@ -34,9 +30,6 @@ int main()
     engine->gameloop = GAME_FUN;
     engine->init = INIT_FUN;
     engine->destroy = DESTROY_FUN;
-
-    srand((unsigned int) time(NULL));
-
     
     engine_init_wrapper(engine);
     levelptr_t level = engine->level;

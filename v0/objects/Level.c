@@ -1,6 +1,20 @@
+/***************************************************************************//**
+  @file     Level.c
+  @brief    Implementación del objeto nivel
+  @author   Grupo 7
+ ******************************************************************************/
+
+
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
 #include "Level.h"
 #include<stdio.h>
 
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ ******************************************************************************/
 static int8_t gen_sign();
 static void generate_car_lane(laneptr_t lane, uint8_t diff);
 static void generate_log_lane(laneptr_t lane, uint8_t diff);
@@ -9,6 +23,11 @@ static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish);
 static void Level_generate(levelptr_t level);
 
 
+/*******************************************************************************
+ *******************************************************************************
+                        GLOBAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 uint8_t Level_init(levelptr_t level) {
     uint8_t i = 0, p = 0;
     
@@ -16,8 +35,6 @@ uint8_t Level_init(levelptr_t level) {
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
         level->finishers[i] = -100;
     }
-    
-
     level->number = 0;
     level->paused = 0;
     level->score = 0;
@@ -33,7 +50,6 @@ uint8_t Level_init(levelptr_t level) {
 
     for(i = 0; i < LEVEL_HEIGHT; i++) {
         level->lanes[i] = malloc(sizeof(lane_t));
-
         if(level->lanes[i] == NULL){
             while(i >= 0){
                 free(level->lanes[i--]);
@@ -42,16 +58,16 @@ uint8_t Level_init(levelptr_t level) {
             free(level->frog);
             return 0;
         }
-        
         level->lanes[i]->delta = 100;
         level->lanes[i]->step = 100;
         level->lanes[i]->x0 = 100;
         level->lanes[i]->mob_length = 1;
-
     }
 
+    srand((unsigned int) time(NULL));
     return 1;
 }
+
 
 uint8_t Level_delete(levelptr_t level) {
     uint8_t i = 0, p = 0;
@@ -60,7 +76,6 @@ uint8_t Level_delete(levelptr_t level) {
         free(level->lanes[i]);
     }
     free(level->lanes);
-
     free(level->frog);
     free(level);
     return 1;
@@ -71,65 +86,40 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
     uint16_t frogx = level->frog->x;
     uint16_t frogy = level->frog->lane;
     uint8_t finish_order;
+
     uint8_t collided = Level_check_collisions(level, &finish_order);
     uint8_t car_collision = collided && level->lanes[frogy]->type == MOB_CAR;
     uint8_t log_collision = !collided && level->lanes[frogy]->type == MOB_LOG;
     uint8_t finisher_collision = !collided && level->lanes[frogy]->type == MOB_FINISH;
-    uint8_t done = 0;
     #ifdef CHEAT
         car_collision = 0;
         log_collision = 0;
     #endif
 
     if(car_collision || log_collision || finisher_collision) {
-        if(Frog_kill(level->frog) == 0) {
-            Frog_move(level->frog, SPAWN_X, SPAWN_Y);
-            done = 1;
-        }
-        else {
+        if(Frog_kill(level->frog) == 1) {
             Frog_move(level->frog, SPAWN_X, SPAWN_Y);
         }
     }
-    /*
-    if(car_collision) {
-        sound_play(SFX_SQUASH, volume, ALLEGRO_PLAYMODE_ONCE, NULL);
-    } else if(log_collision) {
-        sound_play(SFX_PLUNK, volume, ALLEGRO_PLAYMODE_ONCE, NULL);
-    } else if(finisher_collision) {
-        sound_play(SFX_SQUASH, volume, ALLEGRO_PLAYMODE_ONCE, NULL);
-    }
-    */
-    /*
-    for(int i = 0; i < LVL_FINISHSPOTS; i++) {
-        printf("%d ", level->finishers[i]);
-    }
-    printf("\n");
-    */
-   uint8_t sum = 0;
+
+    uint8_t sum = 0;
     if(collided && level->lanes[frogy]->type == MOB_FINISH) {
         if(is_in_array(level->finishers, finish_order, LVL_FINISHSPOTS)){
-            if(Frog_kill(level->frog) == 0){
-                done = 1;
-            } else {
-                Frog_move(level->frog, SPAWN_X, SPAWN_Y);
-            }
+            Frog_kill(level->frog);
         } else {
             level->finishers[level->finisher_count++] = finish_order;
-            //level->score += 1;
             sum = 1;
             if(level->finisher_count == LVL_FINISHSPOTS){
-                //level->score += 5*(level->number + 1);
                 sum = 5*(level->number + 1);
                 Level_next(level);
             } else {
                 Frog_move(level->frog, SPAWN_X, SPAWN_Y);
             }
-            //printf("%d\n", level->score);
         }
     }
-    //return done;
     return sum;
 }
+
 
 void Level_next(levelptr_t level) {
     uint8_t i = 0;
@@ -143,12 +133,28 @@ void Level_next(levelptr_t level) {
     }
 }
 
+
 void Level_reset(levelptr_t level) {
     level->number = 0;
     level->score = 0;
     Level_next(level);
 }
 
+
+uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len) {
+    uint8_t i = 0;
+    for(i = 0; i < len; i++) {
+        if(arr[i] == elem) return 1;
+    }
+    return 0;
+}
+
+
+/*******************************************************************************
+ *******************************************************************************
+                        LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
     float frog_x = ((float) level->frog->x) / REFERENCE_WIDTH;
     uint8_t frog_y = level->frog->lane;
@@ -168,7 +174,7 @@ static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
     return 0;
 }
 
-// a a
+
 static int8_t gen_sign() {
     return 1 - 2 * (rand() % 2);
 }
@@ -211,13 +217,6 @@ static void generate_floor_lane(laneptr_t lane) {
     lane->x0 = 0;
 }
 
-uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len) {
-    uint8_t i = 0;
-    for(i = 0; i < len; i++) {
-        if(arr[i] == elem) return 1;
-    }
-    return 0;
-}
 
 static void Level_generate(levelptr_t level) {
     uint8_t i = 0;

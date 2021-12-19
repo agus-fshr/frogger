@@ -1,6 +1,25 @@
+/***************************************************************************//**
+  @file     LEDMatrixEngine.c
+  @brief    Implementación de la interfaz específica RPi
+  @author   Grupo 7
+ ******************************************************************************/
 #include "LEDMatrixEngine.h"
+
+
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
 #include<stdio.h>
 
+
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
+
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ ******************************************************************************/
 static void render_map(levelptr_t level);
 static void render_pause(engineptr_t eng);
 static void render_menu(engineptr_t eng);
@@ -10,6 +29,13 @@ static input_t LEDMatEngine_input(engineptr_t eng);
 static void show_menu_score(uint32_t score);
 static void draw_menu_arrows();
 static void show_menu_lives(uint8_t lives);
+
+
+
+/*******************************************************************************
+ * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
+ ******************************************************************************/
+static dcoord_t dcoord;
 
 const dlevel_t arrow_up[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_ON, D_OFF, D_OFF,
@@ -27,19 +53,23 @@ const dlevel_t arrow_down[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_ON, D_OFF, D_OFF
 };
 
-static dcoord_t dcoord;
 
 
+/*******************************************************************************
+ *******************************************************************************
+                        GLOBAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 int LEDMatEngine_init(engineptr_t eng) {
     joy_init();
     disp_init();
     dcoord.x = 0;
     dcoord.y = 0;
-    return 0;
+    return 1;
 }
 
 int LEDMatEngine_destroy(engineptr_t eng){
-    return 0;
+    return 1;
 }
 
 int LEDMatEngine_gameloop(engineptr_t eng) {
@@ -62,6 +92,12 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     return 0;
 }
 
+
+/*******************************************************************************
+ *******************************************************************************
+                        LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 static void LEDMatEngine_render(engineptr_t eng) {
     
     disp_clear_buf();
@@ -73,15 +109,7 @@ static void LEDMatEngine_render(engineptr_t eng) {
             break;
 
         case GAME_STA_PLAY:
-            
             render_map(eng->level);
-
-            //disp_clear_buf();
-            
-            //usleep(50000);
-            //disp_write_sanitized(dcoord, D_ON);
-
-
             break;
         
         case GAME_STA_PAUSE:
@@ -93,8 +121,8 @@ static void LEDMatEngine_render(engineptr_t eng) {
             break;
     }
     disp_update();
-
 }
+
 
 static input_t LEDMatEngine_input(engineptr_t eng) {
     static input_t last_input = INPUT_NULL;
@@ -110,11 +138,11 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
         process_game_state(eng, INPUT_ENTER);
     }
     last_switch = sw;
-     
+    /* NOT WORKING!
     if(actual_input != INPUT_NULL && actual_input != INPUT_ENTER) {
         //sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
-
+    */
     if(coord.y > DEADZONE)
         actual_input = INPUT_UP;
     else if(coord.y < -DEADZONE)
@@ -132,10 +160,10 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
     if(actual_input != last_input) {
         last_input = actual_input;
         return actual_input;
-    } else {
-        return INPUT_NULL;
-    }
+    } 
+    return INPUT_NULL;
 }
+
 
 static void render_pause(engineptr_t eng) {
     dcoord.x = 1;
@@ -154,6 +182,7 @@ static void render_pause(engineptr_t eng) {
     show_menu_score(eng->score);
 }
 
+
 static void render_menu(engineptr_t eng) {
     dcoord.x = 1;
     dcoord.y = 6;
@@ -170,6 +199,7 @@ static void render_menu(engineptr_t eng) {
     //write_letter('E', dcoord);
 }
 
+
 static void render_death(engineptr_t eng) {
     dcoord.x = 1;
     dcoord.y = 6;
@@ -182,6 +212,7 @@ static void render_death(engineptr_t eng) {
     draw_menu_arrows();
     show_menu_score(eng->score);
 }
+
 
 static void render_map(levelptr_t level) {
     static uint8_t flicker = 0;
@@ -236,6 +267,7 @@ static void render_map(levelptr_t level) {
     }
 }
 
+
 static void show_menu_score(uint32_t score) {
     dcoord.y = DISP_MAX_Y+1;
     dcoord.x = DISP_MAX_X;
@@ -245,6 +277,7 @@ static void show_menu_score(uint32_t score) {
     }
 }
 
+
 static void draw_menu_arrows() {
     dcoord.y = 0;
     dcoord.x = 5;
@@ -253,6 +286,7 @@ static void draw_menu_arrows() {
     dcoord.x = 5;
     write_bmp(arrow_down, dcoord);
 }
+
 
 static void show_menu_lives(uint8_t lives) {
     dcoord.y = 0;

@@ -19,7 +19,7 @@ $(target): $(maintarget) Frog.o Level.o Lane.o $(dep) GameEngine.o
 $(maintarget): main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h $(dep)
 	gcc -c main.c -o $(maintarget) $(flag)
 
-Frog.o: objects/Frog.c objects/Frog.h libs/position.h
+Frog.o: objects/Frog.c objects/Frog.h
 	gcc -c objects/Frog.c -o Frog.o
 
 Lane.o: objects/Lane.c objects/Lane.h

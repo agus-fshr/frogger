@@ -1,9 +1,22 @@
+/***************************************************************************//**
+  @file     GameEngine.h
+  @brief    Header de la abstracción de núcleo de juego
+  @author   Grupo 7
+ ******************************************************************************/
 #ifndef __GAME_ENGINE_H
 #define __GAME_ENGINE_H
+
+
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
 #include "Level.h"
 #include <stdio.h>
 
 
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
 typedef enum {
     GAME_STA_MENU = 1,
     GAME_STA_PLAY,
@@ -54,7 +67,6 @@ typedef enum {
 } input_t;
 
 
-
 struct engineT;
 
 typedef struct engineT engine_t;
@@ -79,19 +91,50 @@ struct engineT {
 typedef  engine_t * engineptr_t; 
 
 
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
+ ******************************************************************************/
+/**
+ * @brief Initializes FSMs and volume
+ * @param eng Pointer to engine
+ */ 
 void initialize_game_status(engineptr_t eng);
+
+/**
+ * @brief Initializes abstract engine and specific implementation
+ * @param eng Pointer to engine
+ */ 
 void engine_init_wrapper(engineptr_t eng);
+
+
+/**
+ * @brief Destroys abstract engine and specific implementation
+ * @param eng Pointer to engine
+ */ 
 void engine_destroy_wrapper(engineptr_t eng);
 
 
+/**
+ * @brief Processes general game FSM
+ * @param eng Pointer to engine
+ */ 
 void process_game_state(engineptr_t eng, input_t input);
-void process_menu_state(engineptr_t eng, input_t input);
-void process_pause_state(engineptr_t eng, input_t input);
-void process_death_state(engineptr_t eng, input_t input);
-void process_play_state(engineptr_t eng, input_t input);
-void process_exit_state(engineptr_t eng, input_t input);
 
+
+/**
+ * @brief Fetches highscore from file
+ * @return Internal score value
+ */ 
 uint32_t get_highscore(void);
+
+
+/**
+ * @brief Transforms internal width to display width
+ * @param width Width to transform
+ * @param block_width Block width of graphical coordinate system
+ * @return Equivalent display width
+ */ 
 float scale_width(int16_t width, int16_t block_width);
 
 #endif

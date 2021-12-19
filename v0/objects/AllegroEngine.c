@@ -1,6 +1,17 @@
+/***************************************************************************//**
+  @file     GameEngine.c
+  @brief    Implementación de la interfaz específica de Allegro
+  @author   Grupo 7
+ ******************************************************************************/
 #include "AllegroEngine.h"
-#include <stdio.h>
 
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ ******************************************************************************/
 static void render_map(levelptr_t level);
 static void render_pause(engineptr_t eng);
 static void render_menu(engineptr_t eng);
@@ -14,12 +25,22 @@ static void AllegroEngine_render(engineptr_t eng);
 static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p);
 static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p);
 
+
+/*******************************************************************************
+ * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
+ ******************************************************************************/
 static ALLEGRO_DISPLAY* disp;
 static ALLEGRO_BITMAP* bitmap;
 static ALLEGRO_TIMER* timer;
 static ALLEGRO_EVENT_QUEUE* queue;
 static ALLEGRO_SAMPLE_ID background_music;
 
+
+/*******************************************************************************
+ *******************************************************************************
+                        GLOBAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 int AllegroEngine_init(engineptr_t eng) {
     al_init();
     al_install_keyboard();
@@ -51,6 +72,7 @@ int AllegroEngine_init(engineptr_t eng) {
     sound_play(SFX_JINGLE, eng->volume, ALLEGRO_PLAYMODE_LOOP, &background_music);
 }
 
+
 int AllegroEngine_destroy(engineptr_t eng){
     //al_destroy_bitmap(bitmap);
     al_destroy_display(disp);
@@ -62,14 +84,12 @@ int AllegroEngine_destroy(engineptr_t eng){
     return 0;
 }
 
+
 int AllegroEngine_gameloop(engineptr_t eng) {
     static ALLEGRO_EVENT event;
-    static uint8_t redraw = 0;
 
     al_wait_for_event(queue, &event);
-    uint8_t i;
-    switch(event.type)
-    {
+    switch(event.type) {
         case ALLEGRO_EVENT_TIMER:
             process_game_state(eng, INPUT_NULL);
             
@@ -81,7 +101,6 @@ int AllegroEngine_gameloop(engineptr_t eng) {
                 al_set_sample_instance_gain(bgmusic_ins, eng->volume);
                 al_unlock_sample_id(&background_music);
             }
-            redraw = 1;
             break;
     
         case ALLEGRO_EVENT_KEY_DOWN:
@@ -92,19 +111,19 @@ int AllegroEngine_gameloop(engineptr_t eng) {
             return 1;
     }
 
-    // BUG: si apretas rapido no analiza colisiones
-    // SOLUCIONADO: no se como tampoco, pero bueno pero es ser de boca
-    if(redraw && al_is_event_queue_empty(queue))
+    if(al_is_event_queue_empty(queue))
     {
         AllegroEngine_render(eng);
-        //printf("%d\n", level->frog->lives);
-        //printf("%d\n", level->number);
-        /*done = */
-        redraw = 0;
     }
     return 0;
 }
 
+
+/*******************************************************************************
+ *******************************************************************************
+                        LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 static void AllegroEngine_render(engineptr_t eng) {
     switch(eng->state) {
         case GAME_STA_MENU:
@@ -126,6 +145,7 @@ static void AllegroEngine_render(engineptr_t eng) {
     }
     al_flip_display();
 }
+
 
 static input_t AllegroEngine_input(engineptr_t eng, int key) {
     levelptr_t level = eng->level;
@@ -159,6 +179,7 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
     return INPUT_NULL;
 }
 
+
 static void render_pause(engineptr_t eng) {
     //al_clear_to_color(al_map_rgb(50, 50, 255));
     ALLEGRO_FONT* font = al_create_builtin_font();
@@ -186,6 +207,7 @@ static void render_pause(engineptr_t eng) {
     al_destroy_font(font);
     
 }
+
 
 static void render_menu(engineptr_t eng) {
     // Bienvenido a la escuela de Magia y Hechicería de Hogwarts
@@ -223,26 +245,30 @@ static void render_menu(engineptr_t eng) {
     al_destroy_font(font);
 }
 
+
 static void render_death(engineptr_t eng) {
-    al_clear_to_color(al_map_rgb(100, 0, 0));
+    ALLEGRO_FONT* font = al_create_builtin_font();
 
-    ALLEGRO_FONT* font = al_load_ttf_font(SELECTED_FONT, 24, 0);
-    al_draw_text(font,al_map_rgb(255,255,255),
-        DISP_WIDTH/2,
-        DISP_HEIGHT/3 - BLOCK_HEIGHT,
-        ALLEGRO_ALIGN_CENTRE,"U DED");
+    bitmap = al_load_bitmap(GET_BMP(BMP_DEATH_BG));
+    al_draw_scaled_bitmap(bitmap, 0, 0, 261, 314,
+                DISP_WIDTH/3-BLOCK_WIDTH, DISP_HEIGHT/5, 
+                DISP_WIDTH/3+2*BLOCK_WIDTH, DISP_HEIGHT/2+BLOCK_HEIGHT, 0);
+    al_destroy_bitmap(bitmap);
 
-    al_draw_multiline_textf(font,al_map_rgb(255,255,255), 
+    
+    font = al_load_ttf_font(SELECTED_FONT, 32, 0);
+    al_draw_multiline_textf(font,al_map_rgb(0,0,0), 
         DISP_WIDTH/2,
-        DISP_HEIGHT/3,
-        DISP_WIDTH,
+        DISP_HEIGHT/3 + 2*BLOCK_HEIGHT,
+        DISP_WIDTH/3,
         0,
         ALLEGRO_ALIGN_CENTRE,
-        "DEAD MENU \n \n \n %c   TRY AGAIN   \n \n   %c   QUIT      \n \n \n \n HIGH SCORE: %d", 
+        "\n      GAME OVER      \n \n  %c  TRY AGAIN      \n     %c  QUIT        \n \n \n    HIGH SCORE: %d    ", 
         eng->deathstate==DEATH_STA_MENU_OP_1 ? '>' : ' ',
         eng->deathstate==DEATH_STA_MENU_OP_2 ? '>' : ' ',
-        get_highscore()
+        get_highscore()*100
     );
+    al_destroy_font(font);
 }
 
 
@@ -297,7 +323,6 @@ static void render_map(levelptr_t level) {
 }
 
 
-
 static void draw_score(uint32_t score) {
     ALLEGRO_FONT* font = al_create_builtin_font();
 
@@ -308,8 +333,6 @@ static void draw_score(uint32_t score) {
         0,"SCORE: %d", score);
     al_destroy_font(font);
 }
-
-
 
 
 static void render_street_lane(levelptr_t level, uint8_t lanenum) {
@@ -325,7 +348,6 @@ static void render_street_lane(levelptr_t level, uint8_t lanenum) {
 }
 
 
-
 static void render_water_lane(levelptr_t level, uint8_t lanenum) {
     uint16_t x = 0;
 
@@ -337,7 +359,6 @@ static void render_water_lane(levelptr_t level, uint8_t lanenum) {
 }
 
 
-
 static void render_floor_lane(levelptr_t level, uint8_t lanenum) {
     uint16_t x = 0;
 
@@ -347,7 +368,6 @@ static void render_floor_lane(levelptr_t level, uint8_t lanenum) {
     }
     al_destroy_bitmap(bitmap);
 }
-
 
 
 static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
@@ -392,7 +412,6 @@ static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
         al_destroy_bitmap(bitmap);
     }
 }
-
 
 
 static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p) {

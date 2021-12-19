@@ -1,10 +1,38 @@
+/***************************************************************************//**
+  @file     GameEngine.c
+  @brief    Implementación de la abstracción de núcleo de juego
+  @author   Grupo 7
+ ******************************************************************************/
+
+
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
 #include "GameEngine.h"
 
-void manage_score(engineptr_t eng);
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ ******************************************************************************/
+static void manage_score(engineptr_t eng);
+static void process_menu_state(engineptr_t eng, input_t input);
+static void process_pause_state(engineptr_t eng, input_t input);
+static void process_death_state(engineptr_t eng, input_t input);
+static void process_play_state(engineptr_t eng, input_t input);
+static void process_exit_state(engineptr_t eng, input_t input);
 
 
+/*******************************************************************************
+ * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
+ ******************************************************************************/
 static FILE* highscorefile;
 
+
+/*******************************************************************************
+ *******************************************************************************
+                        GLOBAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 void initialize_game_status(engineptr_t eng) {
     eng->state = GAME_STA_MENU;
     eng->deathstate = DEATH_STA_MENU_OP_1;
@@ -12,11 +40,11 @@ void initialize_game_status(engineptr_t eng) {
     eng->pausestate = PAUSE_STA_OP_1;
     eng->playstate = PLAY_STA_INIT;
     eng->exitstate = EXIT_STA_OP_1;
-    eng->volume = .1f;
+    eng->volume = .15f;
 }
 
-void process_game_state(engineptr_t eng, input_t input) {
 
+void process_game_state(engineptr_t eng, input_t input) {
     switch(eng->state) {
         case GAME_STA_MENU:
             process_menu_state(eng, input);
@@ -39,7 +67,48 @@ void process_game_state(engineptr_t eng, input_t input) {
     }
 }
 
-void process_menu_state(engineptr_t eng, input_t input) {
+
+void engine_destroy_wrapper(engineptr_t eng) {
+    eng->destroy(eng);
+    Level_delete(eng->level);
+    fclose(highscorefile);
+    free(eng);
+}
+
+
+void engine_init_wrapper(engineptr_t eng) {
+
+    highscorefile = fopen("highscore", "r+");
+    if(highscorefile == NULL) {
+        highscorefile = fopen("highscore", "w+");
+        fclose(highscorefile);
+        highscorefile = highscorefile = fopen("highscore", "r+");
+    }
+    initialize_game_status(eng);
+    eng->level = malloc(sizeof(level_t));
+    Level_init(eng->level);
+    Level_reset(eng->level);
+    eng->init(eng);
+}
+
+float scale_width(int16_t width, int16_t block_width) {
+    return width*block_width/REFERENCE_WIDTH;
+}
+
+uint32_t get_highscore() {
+    uint32_t highscore = 0;
+    fseek(highscorefile, 0, SEEK_SET);
+    fread(&highscore, sizeof(uint32_t), 1, highscorefile);
+    return highscore;
+}
+
+
+/*******************************************************************************
+ *******************************************************************************
+                        LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
+static void process_menu_state(engineptr_t eng, input_t input) {
     switch(input) {
         case INPUT_UP:
         case INPUT_DOWN:
@@ -60,7 +129,8 @@ void process_menu_state(engineptr_t eng, input_t input) {
     }
 }
 
-void process_pause_state(engineptr_t eng, input_t input) {
+
+static void process_pause_state(engineptr_t eng, input_t input) {
     switch(input) {
         case INPUT_UP:
             if(eng->pausestate == PAUSE_STA_OP_2) eng->pausestate = PAUSE_STA_OP_1;
@@ -105,7 +175,8 @@ void process_pause_state(engineptr_t eng, input_t input) {
     }
 }
 
-void process_death_state(engineptr_t eng, input_t input) {
+
+static void process_death_state(engineptr_t eng, input_t input) {
     
     switch(input) {
         case INPUT_UP:
@@ -127,7 +198,8 @@ void process_death_state(engineptr_t eng, input_t input) {
     }
 }
 
-void process_play_state(engineptr_t eng, input_t input) {
+
+static void process_play_state(engineptr_t eng, input_t input) {
     uint8_t i = 0;
 
     if(eng->playstate == PLAY_STA_INIT) {
@@ -201,33 +273,8 @@ void process_play_state(engineptr_t eng, input_t input) {
     }
 }
 
-void engine_destroy_wrapper(engineptr_t eng) {
-    eng->destroy(eng);
-    Level_delete(eng->level);
-    fclose(highscorefile);
-    free(eng);
-}
 
-void engine_init_wrapper(engineptr_t eng) {
-
-    highscorefile = fopen("highscore", "r+");
-    if(highscorefile == NULL) {
-        highscorefile = fopen("highscore", "w+");
-        fclose(highscorefile);
-        highscorefile = highscorefile = fopen("highscore", "r+");
-    }
-    initialize_game_status(eng);
-    eng->level = malloc(sizeof(level_t));
-    Level_init(eng->level);
-    Level_reset(eng->level);
-    eng->init(eng);
-}
-
-float scale_width(int16_t width, int16_t block_width) {
-    return width*block_width/REFERENCE_WIDTH;
-}
-
-void manage_score(engineptr_t eng) {
+static void manage_score(engineptr_t eng) {
     uint32_t highscore = get_highscore();
     if(eng->score > highscore) {
         fseek(highscorefile, 0, SEEK_SET);
@@ -235,11 +282,4 @@ void manage_score(engineptr_t eng) {
         fwrite(&eng->score, sizeof(uint32_t), 1, highscorefile);
         fflush(highscorefile);
     }
-}
-
-uint32_t get_highscore() {
-    uint32_t highscore = 0;
-    fseek(highscorefile, 0, SEEK_SET);
-    fread(&highscore, sizeof(uint32_t), 1, highscorefile);
-    return highscore;
 }

@@ -1,5 +1,20 @@
+/***************************************************************************//**
+  @file     LEDlib.h
+  @brief    Implementación de la librería para manipulación de LED matrix
+  @author   Grupo 7
+ ******************************************************************************/
 #include "LEDlib.h"
 
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ ******************************************************************************/
+static const dlevel_t* get_letter(char c);
+
+
+/*******************************************************************************
+ * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
+ ******************************************************************************/
 const dlevel_t LETTER_A[LETTER_HEIGHT][LETTER_WIDTH] = {
     D_OFF, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
@@ -177,13 +192,19 @@ const dlevel_t LETTER_Z[LETTER_HEIGHT][LETTER_WIDTH] = {
 };
 
 
+
+/*******************************************************************************
+ *******************************************************************************
+                        GLOBAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
 void disp_write_sanitized(dcoord_t coord, dlevel_t val) {
     if(coord.x <= DISP_MAX_X && coord.y <= DISP_MAX_Y) {
         disp_write(coord, val);
     }
 }
 
-#include <stdio.h>
+
 void disp_clear_buf() {
     uint8_t i = 0, j = 0;
     dcoord_t dcoord = {0, 0};
@@ -196,7 +217,55 @@ void disp_clear_buf() {
     }
 }
 
-const dlevel_t* get_letter(char c) {
+
+void write_letter(char c, dcoord_t initial) {
+    uint8_t i = 0, j = 0;
+    dcoord_t dcoord = initial;
+    const dlevel_t* letter = (const dlevel_t*) get_letter(c);
+    for(i = 0; i < LETTER_WIDTH; i++) {
+        dcoord.x = initial.x + i;
+        for(j = 0; j < LETTER_HEIGHT; j++) {
+            dcoord.y = initial.y + j;
+            disp_write_sanitized(dcoord, letter[i + j*LETTER_WIDTH]);
+            // to allow writing from outside display box
+        }
+    }
+}
+
+
+void write_word(const char* s, dcoord_t initial, uint8_t len) {
+    uint8_t i = 0;
+    dcoord_t dcoord;
+    dcoord.y = initial.y;
+    for(i = 0; i < len; i++) {
+        dcoord.x = initial.x + i*LETTER_WIDTH;
+        //printf("%c\n", s[i]);
+        write_letter(s[i], dcoord);
+        initial.x++;
+    }
+}
+
+
+void write_bmp(const dlevel_t* bmp, dcoord_t initial) {
+    uint8_t i = 0, j = 0;
+    dcoord_t dcoord = initial;
+    for(i = 0; i < BMP_WIDTH; i++) {
+        dcoord.x = initial.x + i;
+        for(j = 0; j < BMP_HEIGHT; j++) {
+            dcoord.y = initial.y + j;
+            disp_write_sanitized(dcoord, bmp[i + j*BMP_WIDTH]);
+        }
+    }
+}
+
+
+
+/*******************************************************************************
+ *******************************************************************************
+                        LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
+static const dlevel_t* get_letter(char c) {
     switch(c) {
         case 'A':
         case 'a':
@@ -302,42 +371,5 @@ const dlevel_t* get_letter(char c) {
         case 'Z':
         case'z':
             return LETTER_Z;
-    }
-}
-
-void write_letter(char c, dcoord_t initial) {
-    uint8_t i = 0, j = 0;
-    dcoord_t dcoord = initial;
-    const dlevel_t* letter = (const dlevel_t*) get_letter(c);
-    for(i = 0; i < LETTER_WIDTH; i++) {
-        dcoord.x = initial.x + i;
-        for(j = 0; j < LETTER_HEIGHT; j++) {
-            dcoord.y = initial.y + j;
-            disp_write_sanitized(dcoord, letter[i + j*LETTER_WIDTH]);
-        }
-    }
-}
-
-void write_word(const char* s, dcoord_t initial, uint8_t len) {
-    uint8_t i = 0;
-    dcoord_t dcoord;
-    dcoord.y = initial.y;
-    for(i = 0; i < len; i++) {
-        dcoord.x = initial.x + i*LETTER_WIDTH;
-        //printf("%c\n", s[i]);
-        write_letter(s[i], dcoord);
-        initial.x++;
-    }
-}
-
-void write_bmp(const dlevel_t* bmp, dcoord_t initial) {
-    uint8_t i = 0, j = 0;
-    dcoord_t dcoord = initial;
-    for(i = 0; i < BMP_WIDTH; i++) {
-        dcoord.x = initial.x + i;
-        for(j = 0; j < BMP_HEIGHT; j++) {
-            dcoord.y = initial.y + j;
-            disp_write_sanitized(dcoord, bmp[i + j*BMP_WIDTH]);
-        }
     }
 }

@@ -1,7 +1,6 @@
 #ifndef MOB_H
 #define MOB_H
 #include<stdint.h>
-#include"../libs/position.h"
 
 typedef enum {MOB_CAR = 1, MOB_LOG, MOB_FINISH} mobtype_t;
 
