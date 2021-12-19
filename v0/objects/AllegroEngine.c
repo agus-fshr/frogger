@@ -149,6 +149,7 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
     if(key == ALLEGRO_KEY_DOWN) return INPUT_DOWN;
     if(key == ALLEGRO_KEY_LEFT) return INPUT_LEFT;
     if(key == ALLEGRO_KEY_RIGHT) return INPUT_RIGHT;
+    if(key == ALLEGRO_KEY_ENTER) return INPUT_ENTER;
     return INPUT_NULL;
 }
 
