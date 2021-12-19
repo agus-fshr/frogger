@@ -15,6 +15,22 @@
 #define DISP_HEIGHT (BLOCK_HEIGHT * LEVEL_HEIGHT)
 #define DISP_WIDTH (BLOCK_WIDTH * LEVEL_WIDTH)
 
+#define SELECTED_FONT "fonts/Gamer.ttf"
+
+#define BMP_FOLDER "sprites/"
+#define BMP_CARRIAGE "mobinit.png"
+#define BMP_REINDEER "mobcont.png"
+#define BMP_LOG_HEAD "log1_64.png"
+#define BMP_LOG_BODY "log2_64.png"
+#define BMP_LOG_END  "log3_64.png"
+#define BMP_LILYPAD  "lily_64.png"
+#define BMP_FROG     "frog_64.png"
+#define BMP_HEART    "heart.png"
+#define BMP_WATER    "water1.png"
+#define BMP_ROAD     "snowy_road.png"
+
+#define GET_BMP(s) (BMP_FOLDER s)
+
 int AllegroEngine_init(engineptr_t);
 int AllegroEngine_destroy(engineptr_t);
 int AllegroEngine_gameloop(engineptr_t);

@@ -30,6 +30,7 @@ int AllegroEngine_init(engineptr_t eng) {
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_VIDEO_BITMAP);
     
     al_init_ttf_addon();
+    al_init_font_addon();
     al_init_primitives_addon();
     al_init_image_addon();
 
@@ -51,6 +52,8 @@ int AllegroEngine_destroy(engineptr_t eng){
     //al_destroy_bitmap(bitmap);
     al_destroy_display(disp);
     sound_destroy();
+    al_shutdown_ttf_addon();
+    al_shutdown_font_addon();
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     return 0;
@@ -176,30 +179,38 @@ static void render_pause(engineptr_t eng) {
     al_destroy_font(font);
 }
 
-
 static void render_menu(engineptr_t eng) {
+    // Bienvenido a la escuela de Magia y Hechicería de Hogwarts
     al_clear_to_color(al_map_rgb(0, 0, 0));
+    ALLEGRO_BITMAP* bg = al_load_bitmap("sprites/bg.jpg");
+    al_draw_scaled_bitmap(bg, 100, 0, 1900, 1600, 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);
+    al_destroy_bitmap(bg);
 
-    ALLEGRO_FONT* font = al_create_builtin_font();
-    al_draw_text(font,al_map_rgb(255,255,255), 
+    ALLEGRO_FONT* font = al_load_ttf_font(SELECTED_FONT, 148, 0);
+    al_draw_text(font,al_map_rgb(0,180,0), 
         DISP_WIDTH/2,
-        DISP_HEIGHT/2 - BLOCK_HEIGHT,
-        ALLEGRO_ALIGN_CENTRE,"THIS IS a MENU");
+        DISP_HEIGHT/3 - 3*BLOCK_HEIGHT,
+        ALLEGRO_ALIGN_CENTRE,"FROGGER");
+    al_destroy_font(font);
 
-    al_draw_textf(font,al_map_rgb(255,255,255), 
+    font = al_load_ttf_font(SELECTED_FONT, 28, 0);
+    al_draw_text(font,al_map_rgb(200,0,0), 
         DISP_WIDTH/2,
-        DISP_HEIGHT/2,
-        ALLEGRO_ALIGN_CENTRE,
-        "MAIN MENU\t%c PLAY\t%c QUIT", 
-        eng->menustate==MENU_STA_OP_1 ? '>' : ' ',
-        eng->menustate==MENU_STA_OP_2 ? '>' : ' '
-    );
+        DISP_HEIGHT/3 - (1.5)*BLOCK_HEIGHT,
+        ALLEGRO_ALIGN_CENTRE,"Christmas Edition!");
+    al_destroy_font(font);
 
-    al_draw_text(font,al_map_rgb(255,255,255), 
+    font = al_load_ttf_font(SELECTED_FONT, 36, 0);
+    al_draw_multiline_textf(font,al_map_rgb(255,255,255), 
         DISP_WIDTH/2,
         DISP_HEIGHT/2 + BLOCK_HEIGHT,
+        DISP_WIDTH,
+        0,
         ALLEGRO_ALIGN_CENTRE,
-        "HIGH SCORE: IDK lol"
+        "\n \n MAIN MENU \n \n \n %c   PLAY     \n \n %c   QUIT     \n \n \n \n HIGH SCORE: %d", 
+        eng->menustate==MENU_STA_OP_1 ? '>' : ' ',
+        eng->menustate==MENU_STA_OP_2 ? '>' : ' ',
+        get_highscore()*100
     );
     al_destroy_font(font);
 }
@@ -207,29 +218,23 @@ static void render_menu(engineptr_t eng) {
 static void render_death(engineptr_t eng) {
     al_clear_to_color(al_map_rgb(100, 0, 0));
 
-    ALLEGRO_FONT* font = al_create_builtin_font();
-    al_draw_text(font,al_map_rgb(255,255,255), 
+    ALLEGRO_FONT* font = al_load_ttf_font(SELECTED_FONT, 24, 0);
+    al_draw_text(font,al_map_rgb(255,255,255),
         DISP_WIDTH/2,
-        DISP_HEIGHT/2 - BLOCK_HEIGHT,
+        DISP_HEIGHT/3 - BLOCK_HEIGHT,
         ALLEGRO_ALIGN_CENTRE,"U DED");
 
-    al_draw_textf(font,al_map_rgb(255,255,255), 
+    al_draw_multiline_textf(font,al_map_rgb(255,255,255), 
         DISP_WIDTH/2,
-        DISP_HEIGHT/2,
+        DISP_HEIGHT/3,
+        DISP_WIDTH,
+        0,
         ALLEGRO_ALIGN_CENTRE,
-        "DEAD MENU\t%c TRY AGAIN\t%c QUIT", 
+        "DEAD MENU \n \n \n %c   TRY AGAIN   \n \n   %c   QUIT      \n \n \n \n HIGH SCORE: %d", 
         eng->deathstate==DEATH_STA_MENU_OP_1 ? '>' : ' ',
-        eng->deathstate==DEATH_STA_MENU_OP_2 ? '>' : ' '
+        eng->deathstate==DEATH_STA_MENU_OP_2 ? '>' : ' ',
+        get_highscore()
     );
-
-    al_draw_text(font,al_map_rgb(255,255,255), 
-        DISP_WIDTH/2,
-        DISP_HEIGHT/2 + BLOCK_HEIGHT,
-        ALLEGRO_ALIGN_CENTRE,
-        "HIGH SCORE: IDK lol"
-    );
-    al_destroy_font(font);
-
 }
 
 
@@ -264,7 +269,7 @@ static void render_map(levelptr_t level) {
                 
                 if(lane->type == MOB_CAR){
                     if(lane->mob_length == 1) {
-                        bitmap = al_load_bitmap("sprites/mobinit.png");
+                        bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
                         al_draw_bitmap(
                             bitmap, 
                             Lane_get_elem_x(lane, p), 
@@ -273,7 +278,7 @@ static void render_map(levelptr_t level) {
                         al_destroy_bitmap(bitmap);
                     } else {
                         if(lane->step > 0) {
-                            bitmap = al_load_bitmap("sprites/mobinit.png");
+                            bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
                             al_draw_bitmap(
                                 bitmap, 
                                 Lane_get_elem_x(lane, p), 
@@ -282,7 +287,7 @@ static void render_map(levelptr_t level) {
                             al_destroy_bitmap(bitmap);
 
                             for(x = 1; x < lane->mob_length; x++) {
-                                bitmap = al_load_bitmap("sprites/mobcont.png");
+                                bitmap = al_load_bitmap(GET_BMP(BMP_REINDEER));
 
                                 al_draw_bitmap(
                                     bitmap, 
@@ -292,7 +297,7 @@ static void render_map(levelptr_t level) {
                             }
                             al_destroy_bitmap(bitmap);
                         } else {
-                            bitmap = al_load_bitmap("sprites/mobinit.png");
+                            bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
                             al_draw_bitmap(
                                 bitmap, 
                                 (lane->mob_length-1)*BLOCK_WIDTH+Lane_get_elem_x(lane, p), 
@@ -301,7 +306,7 @@ static void render_map(levelptr_t level) {
                             al_destroy_bitmap(bitmap);
 
                             for(x = 0; x < lane->mob_length-1; x++) {
-                                bitmap = al_load_bitmap("sprites/mobcont.png");
+                                bitmap = al_load_bitmap(GET_BMP(BMP_REINDEER));
 
                                 al_draw_bitmap(
                                     bitmap, 
@@ -348,28 +353,28 @@ static void render_map(levelptr_t level) {
                     */
                 } else if(lane->type == MOB_LOG) {
                     if(lane->mob_length == 2) {
-                        bitmap = al_load_bitmap("sprites/log1_64.png");
+                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
                         al_draw_bitmap(
                             bitmap, 
                             Lane_get_elem_x(lane, p), 
                             i*BLOCK_HEIGHT, 0);
                         al_destroy_bitmap(bitmap);
 
-                        bitmap = al_load_bitmap("sprites/log3_64.png");
+                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_END));
                         al_draw_bitmap(
                             bitmap, 
                             Lane_get_elem_x(lane, p) + BLOCK_WIDTH, 
                             i*BLOCK_HEIGHT, 0);
                         al_destroy_bitmap(bitmap);
                     } else {
-                        bitmap = al_load_bitmap("sprites/log1_64.png");
+                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
                         al_draw_bitmap(
                             bitmap, 
                             Lane_get_elem_x(lane, p), 
                             i*BLOCK_HEIGHT, 0);
                         al_destroy_bitmap(bitmap);
 
-                        bitmap = al_load_bitmap("sprites/log2_64.png");
+                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_BODY));
                         uint8_t j = 0;
                         for(j = 1; j < lane->mob_length - 1; j++) {
                             al_draw_bitmap(
@@ -379,7 +384,7 @@ static void render_map(levelptr_t level) {
                         }
                         al_destroy_bitmap(bitmap);
                         
-                        bitmap = al_load_bitmap("sprites/log3_64.png");
+                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_END));
                         al_draw_bitmap(
                             bitmap, 
                             Lane_get_elem_x(lane, p) + (lane->mob_length-1)*BLOCK_WIDTH, 
@@ -387,7 +392,7 @@ static void render_map(levelptr_t level) {
                         al_destroy_bitmap(bitmap);
                     }
                 } else if(lane->type == MOB_FINISH) {
-                    bitmap = al_load_bitmap("sprites/lily_64.png");
+                    bitmap = al_load_bitmap(GET_BMP(BMP_LILYPAD));
                     al_draw_bitmap(
                         bitmap, 
                         Lane_get_elem_x(lane, p), 
@@ -408,7 +413,7 @@ static void render_map(levelptr_t level) {
     
     uint16_t frogx = level->frog->x;
     uint16_t frogy = level->frog->lane;
-    bitmap = al_load_bitmap("sprites/frog_64.png");
+    bitmap = al_load_bitmap(GET_BMP(BMP_FROG));
 
     /*al_draw_filled_rectangle(frogx, frogy*BLOCK_WIDTH, frogx + BLOCK_WIDTH, (frogy + 1)*BLOCK_HEIGHT, 
                             al_map_rgb(0, 255, 0));
@@ -426,7 +431,7 @@ static void render_map(levelptr_t level) {
             al_map_rgb(255, 255, 0)); 
     }
     
-    bitmap = al_load_bitmap("sprites/heart.png");
+    bitmap = al_load_bitmap(GET_BMP(BMP_HEART));
     for(i = 0; i < level->frog->lives; i++) {
         al_draw_bitmap(bitmap, (LEVEL_WIDTH-1-i)*BLOCK_WIDTH, (LEVEL_HEIGHT-1)*BLOCK_HEIGHT, 0);
     }
@@ -443,47 +448,22 @@ static void draw_score(uint32_t score) {
 }
 
 static void render_street_lane(levelptr_t level, uint8_t lanenum) {
-    int16_t x = 0;
-    static int8_t street_orientation = 5;
+    uint16_t x = 0;
+    static uint8_t orientation = 0;
+    bitmap = al_load_bitmap(GET_BMP(BMP_ROAD));
     for(x=0; x < DISP_WIDTH; x+=BLOCK_WIDTH) {
-        uint8_t flipped = 0;
-        switch(street_orientation) {
-            case 0:
-            case 4:
-                bitmap = al_load_bitmap("sprites/road1_64.png");
-                break;
-            
-            case 1:
-                bitmap = al_load_bitmap("sprites/road2_64.png");
-                break;
-
-            case 2:
-                bitmap = al_load_bitmap("sprites/road2_64.png");
-                flipped = ALLEGRO_FLIP_VERTICAL;
-                break;
-
-            case 3:
-            case 5:
-                bitmap = al_load_bitmap("sprites/road1_64.png");
-                flipped = ALLEGRO_FLIP_VERTICAL;
-                break;
-            
-            default:
-                break;
-        }
-        al_draw_bitmap(bitmap, x, lanenum*BLOCK_HEIGHT, flipped);
-        al_destroy_bitmap(bitmap);
+        al_draw_bitmap(bitmap, x, lanenum*BLOCK_HEIGHT,
+            orientation % 2 ? ALLEGRO_FLIP_VERTICAL : 0);
     }
-    street_orientation--;
-    if(street_orientation == -1) street_orientation = 5;
+    al_destroy_bitmap(bitmap);
+    if(++orientation == 2) orientation = 0;
 }
-
 
 
 static void render_water_lane(levelptr_t level, uint8_t lanenum) {
     uint16_t x = 0;
 
-    bitmap = al_load_bitmap("sprites/water1.png");
+    bitmap = al_load_bitmap(GET_BMP(BMP_WATER));
     for(x=0; x < DISP_WIDTH; x+=BLOCK_WIDTH) {
         al_draw_bitmap(bitmap, x, lanenum*BLOCK_HEIGHT, 0);
     }

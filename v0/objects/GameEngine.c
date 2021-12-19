@@ -241,7 +241,5 @@ uint32_t get_highscore() {
     uint32_t highscore = 0;
     fseek(highscorefile, 0, SEEK_SET);
     fread(&highscore, sizeof(uint32_t), 1, highscorefile);
-
-    printf("Reading HS: %d\n", highscore);
     return highscore;
 }
