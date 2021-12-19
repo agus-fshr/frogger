@@ -2,6 +2,7 @@ machine := $(shell uname -m)
 gccflags := -Wall
 cheatflags := -D CHEAT
 
+
 ifeq ($(machine), armv7l)
 	target = froggerRPi
 	maintarget = mainRPi.o
@@ -31,7 +32,7 @@ Lane.o: objects/Lane.c objects/Lane.h
 Level.o: objects/Level.c objects/Level.h objects/Frog.h objects/Lane.h config.h
 	gcc -c objects/Level.c -o Level.o $(flag) $(gccflags)
 
-AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/sound.h objects/GameEngine.h
+AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/allegro_sound.h objects/GameEngine.h
 	gcc -c objects/AllegroEngine.c -o AllegroEngine.o $(gccflags) $(cheatflags)
 
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
@@ -43,8 +44,8 @@ LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/G
 LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
 	gcc -c libs/LEDlib.c -o LEDlib.o $(gccflags)
 	
-sound.o: libs/sound.c libs/sound.h
-	gcc -c libs/sound.c -o sound.o $(gccflags)
+allegro_sound.o: libs/allegro_sound.c libs/allegro_sound.h
+	gcc -c libs/allegro_sound.c -o allegro_sound.o $(gccflags)
 
 clean:
 	rm *.o
