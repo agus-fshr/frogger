@@ -145,6 +145,11 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
             key == ALLEGRO_KEY_RIGHT) {
         sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
+    if(key == ALLEGRO_KEY_UP) return INPUT_UP;
+    if(key == ALLEGRO_KEY_DOWN) return INPUT_DOWN;
+    if(key == ALLEGRO_KEY_LEFT) return INPUT_LEFT;
+    if(key == ALLEGRO_KEY_RIGHT) return INPUT_RIGHT;
+    return INPUT_NULL;
 }
 
 static void render_pause(engineptr_t eng) {
