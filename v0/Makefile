@@ -1,21 +1,23 @@
 machine := $(shell uname -m)
 ifeq ($(machine), armv7l)
-	target = mainRPi.o
+	target = froggerRPi
+	maintarget = mainRPi.o
 	dep = LEDMatrixEngine.o LEDlib.o
 	linkedobj = $(dep) libs/joydisp/disdrv.o libs/joydisp/joydrv.o
 	flag = -D LEDMAT
 else 
-	target = mainAllegro.o
+	target = froggerAllegro
+	maintarget = mainAllegro.o
 	dep = sound.o AllegroEngine.o
 	linkedobj = $(dep) `pkg-config allegro-5 allegro_font-5 allegro_primitives-5 allegro_audio-5 allegro_acodec-5 allegro_image-5 allegro_ttf-5 --libs --cflags`
 	flag = -D ALLEGRO
 endif
 
-frogger: $(target) Frog.o Level.o Lane.o $(dep) GameEngine.o
-	gcc $(target) Frog.o Level.o Lane.o $(linkedobj) GameEngine.o -o frogger  -g
+$(target): $(maintarget) Frog.o Level.o Lane.o $(dep) GameEngine.o
+	gcc $(maintarget) Frog.o Level.o Lane.o $(linkedobj) GameEngine.o -o $(target)  -g
 
-$(target): main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h $(dep)
-	gcc -c main.c -o $(target) $(flag)
+$(maintarget): main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h $(dep)
+	gcc -c main.c -o $(maintarget) $(flag)
 
 Frog.o: objects/Frog.c objects/Frog.h libs/position.h
 	gcc -c objects/Frog.c -o Frog.o
