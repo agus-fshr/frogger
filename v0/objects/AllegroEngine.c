@@ -142,6 +142,10 @@ static void AllegroEngine_render(engineptr_t eng) {
         case GAME_STA_DEATH:
             render_death(eng);
             break;
+
+        case GAME_STA_EXIT:
+        default:
+            break;
     }
     al_flip_display();
 }
@@ -183,7 +187,8 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
 
 
 static void render_pause(engineptr_t eng) {
-    //al_clear_to_color(al_map_rgb(50, 50, 255));
+    // A lot of magic numbers ahead, these manage the position
+    // and centering of both text and other drawings
     ALLEGRO_FONT* font = al_create_builtin_font();
 
     bitmap = al_load_bitmap(GET_BMP(BMP_PAUSE_BG));
@@ -201,10 +206,10 @@ static void render_pause(engineptr_t eng) {
         0,
         ALLEGRO_ALIGN_CENTRE,
         "%c    RESUME     \n \n %c   RESET     \n \n %c   QUIT     \n \n \n HIGH SCORE: %d", 
-        eng->pausestate==PAUSE_STA_OP_1 ? '>' : ' ',
-        eng->pausestate==PAUSE_STA_OP_2 ? '>' : ' ',
-        eng->pausestate==PAUSE_STA_OP_3 ? '>' : ' ',
-        get_highscore()*100
+        eng->pausestate==PAUSE_STA_OP_1 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        eng->pausestate==PAUSE_STA_OP_2 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        eng->pausestate==PAUSE_STA_OP_3 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        get_highscore()*HIGHSCORE_MULT
     );
     al_destroy_font(font);
     
@@ -213,62 +218,66 @@ static void render_pause(engineptr_t eng) {
 
 static void render_menu(engineptr_t eng) {
     // Bienvenido a la escuela de Magia y Hechicería de Hogwarts
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    ALLEGRO_BITMAP* bg = al_load_bitmap(GET_BMP(BMP_MAIN_BG));
-    al_draw_scaled_bitmap(bg, 100, 0, 1900, 1600, 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);
-    al_destroy_bitmap(bg);
+    // A lot of magic numbers ahead, these manage the position
+    // and centering of both text and other drawings
 
-    ALLEGRO_FONT* font = al_load_ttf_font(SELECTED_FONT, 148, 0);
-    al_draw_text(font,al_map_rgb(0,180,0), 
+    bitmap = al_load_bitmap(GET_BMP(BMP_MAIN_BG));
+    al_draw_scaled_bitmap(bitmap, 100, 0, 1900, 1600, 0, 0, DISP_WIDTH, DISP_HEIGHT, 0); // image scaling
+    al_destroy_bitmap(bitmap);
+
+    ALLEGRO_FONT* font = al_load_ttf_font(SELECTED_FONT, 148, 0);  //fontsize:148
+    al_draw_text(font,al_map_rgb(0,180,0),  //green text
         DISP_WIDTH/2,
         DISP_HEIGHT/3 - 3*BLOCK_HEIGHT,
         ALLEGRO_ALIGN_CENTRE,"FROGGER");
     al_destroy_font(font);
 
-    font = al_load_ttf_font(SELECTED_FONT, 28, 0);
-    al_draw_text(font,al_map_rgb(200,0,0), 
+    font = al_load_ttf_font(SELECTED_FONT, 28, 0);  //fontsize: 28
+    al_draw_text(font,al_map_rgb(200,0,0),  // Red text
         DISP_WIDTH/2,
         DISP_HEIGHT/3 - (1.5)*BLOCK_HEIGHT,
         ALLEGRO_ALIGN_CENTRE,"Christmas Edition!");
     al_destroy_font(font);
 
-    font = al_load_ttf_font(SELECTED_FONT, 36, 0);
-    al_draw_multiline_textf(font,al_map_rgb(255,255,255), 
+    font = al_load_ttf_font(SELECTED_FONT, 36, 0);  // Fontsize: 36
+    al_draw_multiline_textf(font,al_map_rgb(255,255,255), // White
         DISP_WIDTH/2,
         DISP_HEIGHT/2 + BLOCK_HEIGHT,
         DISP_WIDTH,
         0,
         ALLEGRO_ALIGN_CENTRE,
         "\n \n MAIN MENU \n \n \n %c   PLAY     \n \n %c   QUIT     \n \n \n \n HIGH SCORE: %d", 
-        eng->menustate==MENU_STA_OP_1 ? '>' : ' ',
-        eng->menustate==MENU_STA_OP_2 ? '>' : ' ',
-        get_highscore()*100
+        eng->menustate==MENU_STA_OP_1 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        eng->menustate==MENU_STA_OP_2 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        get_highscore()*HIGHSCORE_MULT
     );
     al_destroy_font(font);
 }
 
 
 static void render_death(engineptr_t eng) {
+    // A lot of magic numbers ahead, these manage the position
+    // and centering of both text and other drawings
     ALLEGRO_FONT* font = al_create_builtin_font();
 
     bitmap = al_load_bitmap(GET_BMP(BMP_DEATH_BG));
-    al_draw_scaled_bitmap(bitmap, 0, 0, 261, 314,
+    al_draw_scaled_bitmap(bitmap, 0, 0, 261, 314,       // image size scaling
                 DISP_WIDTH/3-BLOCK_WIDTH, DISP_HEIGHT/5, 
                 DISP_WIDTH/3+2*BLOCK_WIDTH, DISP_HEIGHT/2+BLOCK_HEIGHT, 0);
     al_destroy_bitmap(bitmap);
 
     
     font = al_load_ttf_font(SELECTED_FONT, 32, 0);
-    al_draw_multiline_textf(font,al_map_rgb(0,0,0), 
+    al_draw_multiline_textf(font,al_map_rgb(0,0,0), //black
         DISP_WIDTH/2,
         DISP_HEIGHT/3 + 2*BLOCK_HEIGHT,
         DISP_WIDTH/3,
         0,
         ALLEGRO_ALIGN_CENTRE,
         "\n      GAME OVER      \n \n  %c  TRY AGAIN      \n     %c  QUIT        \n \n \n    HIGH SCORE: %d    ", 
-        eng->deathstate==DEATH_STA_MENU_OP_1 ? '>' : ' ',
-        eng->deathstate==DEATH_STA_MENU_OP_2 ? '>' : ' ',
-        get_highscore()*100
+        eng->deathstate==DEATH_STA_MENU_OP_1 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        eng->deathstate==DEATH_STA_MENU_OP_2 ? OPTION_SELECTED : OPTION_UNSELECTED,
+        get_highscore()*HIGHSCORE_MULT
     );
     al_destroy_font(font);
 }
@@ -313,23 +322,23 @@ static void render_map(levelptr_t level) {
     uint16_t frogx = level->frog->x;
     uint16_t frogy = level->frog->lane;
     bitmap = al_load_bitmap(GET_BMP(BMP_FROG));
-
     al_draw_bitmap(bitmap, frogx, frogy*BLOCK_HEIGHT, 0);
     al_destroy_bitmap(bitmap);
 
     bitmap = al_load_bitmap(GET_BMP(BMP_HEART));
     for(i = 0; i < level->frog->lives; i++) {
+        // Draws hearts representing remaining lives
         al_draw_bitmap(bitmap, (LEVEL_WIDTH-1-i)*BLOCK_WIDTH, (LEVEL_HEIGHT-1)*BLOCK_HEIGHT, 0);
     }
     al_destroy_bitmap(bitmap);
 }
 
-
+// shows score in bottom-left corner of the screen
 static void draw_score(uint32_t score) {
     ALLEGRO_FONT* font = al_create_builtin_font();
 
-    font = al_load_ttf_font(SELECTED_FONT, 28, 0);
-    al_draw_textf(font,al_map_rgb(0,0,0), 
+    font = al_load_ttf_font(SELECTED_FONT, 28, 0);  //fontisze:28
+    al_draw_textf(font,al_map_rgb(0,0,0), // black
         BLOCK_WIDTH/2,
         (LEVEL_HEIGHT-0.5)*BLOCK_HEIGHT,
         0,"SCORE: %d", score);
@@ -374,6 +383,7 @@ static void render_floor_lane(levelptr_t level, uint8_t lanenum) {
 
 static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
     if(lane->mob_length == 2) {
+        // draws simple log
         bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
         al_draw_bitmap(
             bitmap, 
@@ -388,6 +398,7 @@ static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
             lanenum*BLOCK_HEIGHT, 0);
         al_destroy_bitmap(bitmap);
     } else {
+        // draws head, then mob_length-2 bodies, then foot
         bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
         al_draw_bitmap(
             bitmap, 
@@ -418,6 +429,7 @@ static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
 static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p) {
     uint8_t x = 0;
     if(lane->mob_length == 1) {
+        // single carriage
         bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
         al_draw_bitmap(
             bitmap, 
@@ -426,6 +438,8 @@ static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p) {
             lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
         al_destroy_bitmap(bitmap);
     } else {
+        // draws initial mob sprite, then mob_length-1 secondary mob sprites
+        // and orients based on movement direction
         if(lane->step > 0) {
             bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
             al_draw_bitmap(

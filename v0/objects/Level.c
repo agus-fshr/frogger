@@ -161,9 +161,13 @@ static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
     int8_t p = 0; // iterator
     laneptr_t lane = level->lanes[frog_y];
     if(lane->delta != 0) {   
+        // For some extra elements of the lane, calculates
+        // initial x and final x values, comparing to player's x
+
+        // This could use Lane_get_elem_x and Lane_get_elem_x_end
+        // but we had time issues to make it work nicely
         for(p = -1; p < LEVEL_WIDTH / lane->delta + 2; p++) {    
             float start = ((float) lane->x0)/REFERENCE_WIDTH + p*lane->delta;
-            //printf("%d %f %f\n", frog_y, frog_x, start);
             if(((frog_x+1) > start) && (frog_x < (start + lane->mob_length))) {
                 *finish = p;
                 return 1;
@@ -179,9 +183,13 @@ static int8_t gen_sign() {
 }
 
 static void generate_car_lane(laneptr_t lane, uint8_t diff) {
-    lane->ticks = rand() % 500;
+    // A lot of magic numbers ahead, these manage the difficulty settings
+    // and are more "feels like" than hard calculations. Modify and 
+    // compare to what you would like
+    // We did not have enough time to tidy this up to #defines, but that would be
+    // the correct course of action
+    lane->ticks = 0;
     lane->type = MOB_CAR;
-    //lane->step = gen_sign() * ((20-diff) + rand() % (36 - diff));
     lane->step = gen_sign() * (2 + rand() % (5 + diff));
     if(lane->step == 0) {
         lane->step = gen_sign();
@@ -194,8 +202,13 @@ static void generate_car_lane(laneptr_t lane, uint8_t diff) {
     lane->x0 = 10*(rand() % 6);
 }
 
-static void generate_log_lane(laneptr_t lane, uint8_t diff) {    
-    lane->ticks = rand() % 500;
+static void generate_log_lane(laneptr_t lane, uint8_t diff) {  
+    // A lot of magic numbers ahead, these manage the difficulty settings
+    // and are more "feels like" than hard calculations. Modify and 
+    // compare to what you would like  
+    // We did not have enough time to tidy this up to #defines, but that would be
+    // the correct course of action
+    lane->ticks = 0;
     lane->type = MOB_LOG;
     lane->step = gen_sign() * (1 + rand() % (8+diff));
 

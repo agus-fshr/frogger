@@ -11,7 +11,7 @@
  ******************************************************************************/
 #include "GameEngine.h"
 #include "../config.h"
-#include "../libs/sound.h"
+#include "../libs/allegro_sound.h"
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
@@ -47,6 +47,9 @@
 #define BMP_MAIN_BG   "main_bg.jpg"
 
 #define GET_BMP(s) (BMP_FOLDER s)
+
+#define OPTION_SELECTED '>'
+#define OPTION_UNSELECTED ' '
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE

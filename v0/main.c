@@ -22,7 +22,6 @@
 #endif
 
 
-uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len);
 
 int main()
 {
@@ -33,7 +32,9 @@ int main()
     
     engine_init_wrapper(engine);
     
-    while(!engine->gameloop(engine)) {}
+    while(!engine->gameloop(engine)) {
+        //game loop runs in while condition
+    }
 
     engine_destroy_wrapper(engine);
     

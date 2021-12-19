@@ -86,7 +86,7 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     LEDMatEngine_render(eng);
     
     //printf("%d\n", eng->score);
-    usleep(1000000/48);
+    usleep(1000000*TIMEBASE);
     
     return 0;
 }
@@ -234,12 +234,11 @@ static void render_map(levelptr_t level) {
             for(p = -2; p < (LEVEL_WIDTH / lane->delta) + 2; p++) {
                 
                 if(lane->type == MOB_CAR || lane->type == MOB_LOG) {
-                    dlevel_t val = lane->type == MOB_CAR ? D_ON : D_OFF;
+                    dlevel_t val = lane->type == MOB_CAR ? D_ON : D_OFF;    // logs are OFF, vehicles are ON
                     int16_t pretended_x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);                    
                     int16_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
-                    //printf("%d %d %d %d %d\n", i, p, Lane_get_elem_x(lane, p), pretended_x, limit_x);
                     while(pretended_x < limit_x){
-                        //printf("%d %d %d %d %d\n", i, p, Lane_get_elem_x(lane, p), pretended_x, limit_x);
+                        // draws vehicle or log until length is achieved
                         dcoord.x = pretended_x;
                         disp_write_sanitized(dcoord, val);
                         pretended_x += BLOCK_WIDTH;
@@ -252,6 +251,7 @@ static void render_map(levelptr_t level) {
         }
     }
     
+    // This section makes the user dot flicker in 2x render time
     dcoord.x = scale_width(level->frog->x, BLOCK_WIDTH);
     dcoord.y = level->frog->lane;
     disp_write_sanitized(dcoord, flicker == 1 ? D_ON : D_OFF);

@@ -39,7 +39,7 @@ void initialize_game_status(engineptr_t eng) {
     eng->pausestate = PAUSE_STA_OP_1;
     eng->playstate = PLAY_STA_INIT;
     eng->exitstate = EXIT_STA_OP_1;
-    eng->volume = .15f;
+    eng->volume = .15f;         // Volume is VERY loud
 }
 
 
@@ -61,7 +61,7 @@ void process_game_state(engineptr_t eng, input_t input) {
             process_death_state(eng, input);
             break;
 
-        case GAME_STA_EXIT:
+        case GAME_STA_EXIT: // not implemented
         default:
             break;
     }
@@ -77,12 +77,11 @@ void engine_destroy_wrapper(engineptr_t eng) {
 
 
 void engine_init_wrapper(engineptr_t eng) {
-
-    highscorefile = fopen("highscore", "r+");
+    highscorefile = fopen(HIGHSCORE_FILE, "r+");
     if(highscorefile == NULL) {
-        highscorefile = fopen("highscore", "w+");
+        highscorefile = fopen(HIGHSCORE_FILE, "w+");
         fclose(highscorefile);
-        highscorefile = fopen("highscore", "r+");
+        highscorefile = fopen(HIGHSCORE_FILE, "r+");
     }
     initialize_game_status(eng);
     eng->level = malloc(sizeof(level_t));
@@ -278,7 +277,6 @@ static void manage_score(engineptr_t eng) {
     uint32_t highscore = get_highscore();
     if(eng->score > highscore) {
         fseek(highscorefile, 0, SEEK_SET);
-        printf("Saving HS: %d\n", eng->score);
         fwrite(&eng->score, sizeof(uint32_t), 1, highscorefile);
         fflush(highscorefile);
     }
