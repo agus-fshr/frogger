@@ -12,7 +12,7 @@ ifeq ($(machine), armv7l)
 else 
 	target = froggerAllegro
 	maintarget = mainAllegro.o
-	dep = sound.o AllegroEngine.o
+	dep = allegro_sound.o AllegroEngine.o
 	linkedobj = $(dep) `pkg-config allegro-5 allegro_font-5 allegro_primitives-5 allegro_audio-5 allegro_acodec-5 allegro_image-5 allegro_ttf-5 --libs --cflags`
 	flag = -D ALLEGRO
 endif
