@@ -1,4 +1,5 @@
 #include "LEDMatrixEngine.h"
+#include<stdio.h>
 
 static void render_map(levelptr_t level);
 static void render_pause(engineptr_t eng);
@@ -11,8 +12,8 @@ static void disp_write_sanitized(dcoord_t coord, dlevel_t val);
 static dcoord_t dcoord;
 
 static void disp_write_sanitized(dcoord_t coord, dlevel_t val) {
-    if(coord.x < DISP_MAX_X && coord.y < DISP_MAX_Y) {
-        disp_write_sanitized(coord, val);
+    if(coord.x <= DISP_MAX_X && coord.y <= DISP_MAX_Y) {
+        disp_write(coord, val);
     }
 }
 int LEDMatEngine_init(engineptr_t eng) {
@@ -28,30 +29,42 @@ int LEDMatEngine_destroy(engineptr_t eng){
 }
 
 int LEDMatEngine_gameloop(engineptr_t eng) {
-    process_game_state(eng, INPUT_NULL);
+    uint8_t i = 0;
 
+    process_game_state(eng, INPUT_NULL);
+    if(eng->state == GAME_STA_PLAY) {
+        for(i = 0; i < LEVEL_HEIGHT; i++) {
+            Lane_tick(eng->level->lanes[i]);
+        }
+    }
+    //printf("%d %d %d %d %d\n", eng->state, eng->playstate, eng->pausestate, eng->menustate, eng->deathstate);
     if(eng->state == GAME_STA_EXIT) {
         return 1;
     }
     laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
     if(lane->type == MOB_LOG) {
         int16_t newx = eng->level->frog->x + lane->step;
-        if((newx > 0) && (newx+BLOCK_WIDTH < BLOCK_WIDTH*LEVEL_WIDTH)) {
+        if((newx > 0) && (newx+REFERENCE_WIDTH < REFERENCE_WIDTH*LEVEL_WIDTH)) {
             eng->level->frog->x = newx;
         } else {
             if(newx < 0) eng->level->frog->x = 0;
-            else eng->level->frog->x = (LEVEL_WIDTH - 1)*BLOCK_WIDTH;
+            else eng->level->frog->x = (LEVEL_WIDTH - 1)*REFERENCE_WIDTH;
         }
     }
+    
     LEDMatEngine_input(eng);
     LEDMatEngine_render(eng);
     eng->score += Level_process_collisions(eng->level, eng->volume);
-    //sleep(100);
-    return 1;
+    
+    usleep(1000000);
+    
+    return 0;
 }
 
 static void LEDMatEngine_render(engineptr_t eng) {
     disp_clear();
+    //printf("A\n");
+    //printf("%d\n", eng->state);
     switch(eng->state) {
         case GAME_STA_MENU:
             render_menu(eng);
@@ -92,7 +105,7 @@ static void LEDMatEngine_input(engineptr_t eng) {
     else if(joyright)
         process_game_state(eng, INPUT_RIGHT);
 
-    if(sw = J_PRESS)
+    if(sw == J_PRESS)
         process_game_state(eng, INPUT_ENTER);
         
     if(joyup || joydown || joyleft || joyright) {
@@ -106,8 +119,8 @@ static void render_pause(engineptr_t eng) {
     disp_write_sanitized(dcoord, D_ON);
 }
 static void render_menu(engineptr_t eng) {
-    dcoord.x = 0;
-    dcoord.y = eng->menustate;
+    dcoord.x = 8;
+    dcoord.y = 8 + eng->menustate;
     disp_write_sanitized(dcoord, D_ON);
 }
 static void render_death(engineptr_t eng) {
@@ -122,27 +135,31 @@ static void render_map(levelptr_t level) {
         dcoord.y = i;
         
         if(lane->delta != 0) {
+            if(lane->type == MOB_LOG) {
+                dcoord.x = 0;
+                while(dcoord.x < DISP_WIDTH) {
+                    disp_write_sanitized(dcoord, D_ON);
+                    dcoord.x += BLOCK_WIDTH;
+                }
+            }
             for(p = -1; p < (LEVEL_WIDTH / lane->delta) + 2; p++) {
                 
                 if(lane->type == MOB_CAR) {
-                    dcoord.x = Lane_get_elem_x(lane, p);
-                    while(dcoord.x < Lane_get_elem_x_end(lane, p)){
+                    dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
+                    uint8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
+                    while(dcoord.x < limit_x){
                         disp_write_sanitized(dcoord, D_ON);
                         dcoord.x += BLOCK_WIDTH;
                     }
                 } else if(lane->type == MOB_LOG) {
-                    dcoord.x = 0;
-                    while(dcoord.x < DISP_WIDTH) {
-                        disp_write_sanitized(dcoord, D_ON);
-                        dcoord.x += BLOCK_WIDTH;
-                    }
-                    dcoord.x = Lane_get_elem_x(lane, p);
-                    while(dcoord.x < Lane_get_elem_x_end(lane, p)){
+                    dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
+                    uint8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
+                    while(dcoord.x < limit_x){
                         disp_write_sanitized(dcoord, D_OFF);
                         dcoord.x += BLOCK_WIDTH;
                     }
                 } else if(lane->type == MOB_FINISH) {
-                    dcoord.x = Lane_get_elem_x(lane, p);
+                    dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
                     disp_write_sanitized(dcoord, D_ON);
                 }
             }
@@ -150,7 +167,7 @@ static void render_map(levelptr_t level) {
         
     }
     
-    uint16_t frogx = level->frog->x;
+    uint16_t frogx = scale_width(level->frog->x, BLOCK_WIDTH);
     uint16_t frogy = level->frog->lane;
     dcoord.x = frogx;
     dcoord.y = frogy;

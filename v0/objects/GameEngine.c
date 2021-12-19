@@ -124,7 +124,6 @@ void process_death_state(engineptr_t eng, input_t input) {
 }
 
 void process_play_state(engineptr_t eng, input_t input) {
-    uint8_t i;
     switch(input) {
         case INPUT_UP:
             if(eng->level->frog->lane >= 1)
@@ -141,8 +140,8 @@ void process_play_state(engineptr_t eng, input_t input) {
             break;
         
         case INPUT_LEFT:
-            if(eng->level->frog->x >= 64)
-                eng->level->frog->x -= 64;
+            if(eng->level->frog->x >= REFERENCE_WIDTH)
+                eng->level->frog->x -= REFERENCE_WIDTH;
             eng->level->frog->movement = MOVE_LEFT;
             //eng->volume -= 0.1f;
             //if(eng->volume < 0) eng->volume = 0.0f;
@@ -150,8 +149,8 @@ void process_play_state(engineptr_t eng, input_t input) {
 
 
         case INPUT_RIGHT:
-            if(eng->level->frog->x < (LEVEL_WIDTH-1)*64)
-                eng->level->frog->x += 64;
+            if(eng->level->frog->x < (LEVEL_WIDTH-1)*REFERENCE_WIDTH)
+                eng->level->frog->x += REFERENCE_WIDTH;
             eng->level->frog->movement = MOVE_RIGHT;
             //eng->volume += 0.1f;
             //if(eng->volume > 0) eng->volume = 1.0f;
@@ -163,9 +162,6 @@ void process_play_state(engineptr_t eng, input_t input) {
             break;
             
         default:
-            for(i = 0; i < LEVEL_HEIGHT; i++) {
-                Lane_tick(eng->level->lanes[i]);
-            }
             break;
     }
     if(eng->playstate == PLAY_STA_INIT) {
@@ -190,4 +186,8 @@ void engine_init_wrapper(engineptr_t eng) {
     Level_init(eng->level);
     Level_reset(eng->level);
     eng->init(eng);
+}
+
+float scale_width(uint16_t width, uint16_t block_width) {
+    return width*block_width/REFERENCE_WIDTH;
 }

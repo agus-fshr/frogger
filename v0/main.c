@@ -37,6 +37,7 @@ int main()
 
     srand((unsigned int) time(NULL));
 
+    
     engine_init_wrapper(engine);
     levelptr_t level = engine->level;
     

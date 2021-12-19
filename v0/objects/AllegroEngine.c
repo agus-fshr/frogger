@@ -67,18 +67,22 @@ int AllegroEngine_gameloop(engineptr_t eng) {
         case ALLEGRO_EVENT_TIMER:
             process_game_state(eng, INPUT_NULL);
             
-            if(eng->state == GAME_STA_EXIT) {
+            if(eng->state == GAME_STA_PLAY) {
+                for(i = 0; i < LEVEL_HEIGHT; i++) {
+                    Lane_tick(eng->level->lanes[i]);
+                }
+            } else if(eng->state == GAME_STA_EXIT) {
                 return 1;
             }
             
             laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
             if(lane->type == MOB_LOG) {
                 int16_t newx = eng->level->frog->x + lane->step;
-                if((newx > 0) && (newx+BLOCK_WIDTH < BLOCK_WIDTH*LEVEL_WIDTH)) {
+                if((newx > 0) && (newx+REFERENCE_WIDTH < REFERENCE_WIDTH*LEVEL_WIDTH)) {
                     eng->level->frog->x = newx;
                 } else {
                     if(newx < 0) eng->level->frog->x = 0;
-                    else eng->level->frog->x = (LEVEL_WIDTH - 1)*BLOCK_WIDTH;
+                    else eng->level->frog->x = (LEVEL_WIDTH - 1)*REFERENCE_WIDTH;
                 }
             }
 

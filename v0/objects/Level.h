@@ -6,6 +6,7 @@
 #include"Lane.h"
 #include"../config.h"
 
+#define REFERENCE_WIDTH (64.0)
 
 typedef struct {
     uint8_t number;

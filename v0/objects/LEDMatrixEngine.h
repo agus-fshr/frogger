@@ -5,6 +5,7 @@
 #include "../config.h"
 #include "../libs/joydisp/joydrv.h"
 #include "../libs/joydisp/disdrv.h"
+#include <unistd.h>
 
 #define BLOCK_HEIGHT (1)
 #define BLOCK_WIDTH  (1)
