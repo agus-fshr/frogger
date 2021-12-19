@@ -185,22 +185,20 @@ static void render_menu(engineptr_t eng) {
     dcoord.x = 5;
     write_bmp(arrow_up, dcoord);
 
-
     dcoord.y = DISP_MAX_Y-4;
     dcoord.x = 5;
     write_bmp(arrow_down, dcoord);
-
-    /*
+    
+    uint32_t highscore = get_highscore();
     dcoord.y = DISP_MAX_Y;
     dcoord.x = DISP_MAX_X;
     while(dcoord.y > 0) {
-        disp_write_sanitized(dcoord, (eng->score >> dcoord.y) & 1 ? D_ON : D_OFF);
+        disp_write_sanitized(dcoord, (highscore >> dcoord.y) & 1 ? D_ON : D_OFF);
         dcoord.y--;
     }
-    */
+    
     //disp_write_sanitized(dcoord, D_ON);
     //write_letter('E', dcoord);
-    
 }
 
 static void render_death(engineptr_t eng) {

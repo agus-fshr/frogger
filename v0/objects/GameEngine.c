@@ -222,11 +222,21 @@ float scale_width(int16_t width, int16_t block_width) {
 }
 
 void manage_score(engineptr_t eng) {
-    fseek(highscorefile, 0, SEEK_SET);
-    uint32_t highscore;
-    fread(&highscore, sizeof(uint32_t), 1, highscorefile);
+    uint32_t highscore = get_highscore();
+    eng->score = 51;
     if(eng->score > highscore) {
+        fseek(highscorefile, 0, SEEK_SET);
+        printf("Saving HS: %d\n", eng->score);
         fwrite(&eng->score, sizeof(uint32_t), 1, highscorefile);
         fflush(highscorefile);
     }
+}
+
+uint32_t get_highscore() {
+    uint32_t highscore = 0;
+    fseek(highscorefile, 0, SEEK_SET);
+    fread(&highscore, sizeof(uint32_t), 1, highscorefile);
+
+    printf("Reading HS: %d\n", highscore);
+    return highscore;
 }

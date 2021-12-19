@@ -106,7 +106,7 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
     }
     printf("\n");
     */
-   uint8_t sum;
+   uint8_t sum = 0;
     if(collided && level->lanes[frogy]->type == MOB_FINISH) {
         if(is_in_array(level->finishers, finish_order, LVL_FINISHSPOTS)){
             if(Frog_kill(level->frog) == 0){
@@ -114,7 +114,7 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
             } else {
                 Frog_move(level->frog, SPAWN_X, SPAWN_Y);
             }
-        } else{
+        } else {
             level->finishers[level->finisher_count++] = finish_order;
             //level->score += 1;
             sum = 1;
