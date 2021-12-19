@@ -12,7 +12,7 @@ void initialize_game_status(engineptr_t eng) {
     eng->pausestate = PAUSE_STA_OP_1;
     eng->playstate = PLAY_STA_INIT;
     eng->exitstate = EXIT_STA_OP_1;
-    eng->volume = 1.0f;
+    eng->volume = .1f;
 }
 
 void process_game_state(engineptr_t eng, input_t input) {
