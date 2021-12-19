@@ -19,6 +19,7 @@
         "level.h": "c",
         "gameengine.h": "c",
         "disdrv.h": "c",
-        "joydrv.h": "c"
+        "joydrv.h": "c",
+        "ledlib.h": "c"
     }
 }

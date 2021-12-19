@@ -371,5 +371,8 @@ static const dlevel_t* get_letter(char c) {
         case 'Z':
         case'z':
             return LETTER_Z;
+        
+        default:
+            return ((void*) 0);
     }
 }
