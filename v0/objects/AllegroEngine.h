@@ -28,6 +28,10 @@
 #define BMP_HEART    "heart.png"
 #define BMP_WATER    "water1.png"
 #define BMP_ROAD     "snowy_road.png"
+#define BMP_FLOOR    "floor.png"
+
+#define BMP_PAUSE_BG  "pause_bg.png"
+#define BMP_MAIN_BG   "main_bg.jpg"
 
 #define GET_BMP(s) (BMP_FOLDER s)
 

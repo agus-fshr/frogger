@@ -7,9 +7,12 @@ static void render_menu(engineptr_t eng);
 static void render_death(engineptr_t eng);
 static void render_street_lane(levelptr_t level, uint8_t lanenum);
 static void render_water_lane(levelptr_t level, uint8_t lanenum);
+static void render_floor_lane(levelptr_t level, uint8_t lanenum);
 static void draw_score(uint32_t score);
 static input_t AllegroEngine_input(engineptr_t eng, int key);
 static void AllegroEngine_render(engineptr_t eng);
+static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p);
+static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p);
 
 static ALLEGRO_DISPLAY* disp;
 static ALLEGRO_BITMAP* bitmap;
@@ -157,32 +160,37 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
 }
 
 static void render_pause(engineptr_t eng) {
-    al_clear_to_color(al_map_rgb(50, 50, 255));
+    //al_clear_to_color(al_map_rgb(50, 50, 255));
     ALLEGRO_FONT* font = al_create_builtin_font();
 
-    al_draw_textf(font,al_map_rgb(0,0,0), 
+    bitmap = al_load_bitmap(GET_BMP(BMP_PAUSE_BG));
+    al_draw_scaled_bitmap(bitmap, 0, 0, 300, 300,
+                DISP_WIDTH/3, DISP_HEIGHT/3, 
+                DISP_WIDTH/3, DISP_HEIGHT/3, 0);
+    al_destroy_bitmap(bitmap);
+
+    
+    font = al_load_ttf_font(SELECTED_FONT, 32, 0);
+    al_draw_multiline_textf(font,al_map_rgb(0,0,0), 
         DISP_WIDTH/2,
-        DISP_HEIGHT/2,
+        DISP_HEIGHT/3 + 1.5*BLOCK_HEIGHT,
+        DISP_WIDTH/3,
+        0,
         ALLEGRO_ALIGN_CENTRE,
-        "PAUSE MENU\t%c RESUME\t%c RESET\t%c QUIT", 
+        "%c    RESUME     \n \n %c   RESET     \n \n %c   QUIT     \n \n \n HIGH SCORE: %d", 
         eng->pausestate==PAUSE_STA_OP_1 ? '>' : ' ',
         eng->pausestate==PAUSE_STA_OP_2 ? '>' : ' ',
-        eng->pausestate==PAUSE_STA_OP_3 ? '>' : ' '
-    );
-
-    al_draw_textf(font,al_map_rgb(0,0,0), 
-        DISP_WIDTH/2,
-        DISP_HEIGHT/2 + BLOCK_HEIGHT,
-        ALLEGRO_ALIGN_CENTRE,
-        "SCORE: %d", eng->score*100
+        eng->pausestate==PAUSE_STA_OP_3 ? '>' : ' ',
+        get_highscore()*100
     );
     al_destroy_font(font);
+    
 }
 
 static void render_menu(engineptr_t eng) {
     // Bienvenido a la escuela de Magia y Hechicería de Hogwarts
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    ALLEGRO_BITMAP* bg = al_load_bitmap("sprites/bg.jpg");
+    ALLEGRO_BITMAP* bg = al_load_bitmap(GET_BMP(BMP_MAIN_BG));
     al_draw_scaled_bitmap(bg, 100, 0, 1900, 1600, 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);
     al_destroy_bitmap(bg);
 
@@ -243,194 +251,44 @@ static void render_map(levelptr_t level) {
     int16_t i=0, p=0, x=0;
     for(i = 0; i < LEVEL_HEIGHT; i++) {
         laneptr_t lane = level->lanes[i];
-        uint8_t red = 0;
-        uint8_t green = 0;
-        uint8_t blue = 0;
         if(lane->type == MOB_CAR) {
             render_street_lane(level, i);
         } else if(lane->type == MOB_LOG) {
             render_water_lane(level, i);
-            red = 150;
-            green = 100;
-            blue = 100;
         } else if(lane->type == MOB_FINISH) {
-            red = 0;
-            green = 150;
-            blue = 0;
+            render_water_lane(level, i);
         } else if(lane->type == MOB_FLOOR) {
-            al_draw_filled_rectangle(
-                0, i*BLOCK_HEIGHT, DISP_WIDTH,
-                (1 + i)*BLOCK_HEIGHT, al_map_rgb(150, 150, 150)); 
+            render_floor_lane(level, i);
         }
 
         
         if(lane->delta != 0) {
             for(p = -1; p < (LEVEL_WIDTH / lane->delta) + 2; p++) {
-                
                 if(lane->type == MOB_CAR){
-                    if(lane->mob_length == 1) {
-                        bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
-                        al_draw_bitmap(
-                            bitmap, 
-                            Lane_get_elem_x(lane, p), 
-                            i*BLOCK_HEIGHT, 
-                            lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
-                        al_destroy_bitmap(bitmap);
-                    } else {
-                        if(lane->step > 0) {
-                            bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
-                            al_draw_bitmap(
-                                bitmap, 
-                                Lane_get_elem_x(lane, p), 
-                                i*BLOCK_HEIGHT, 
-                                lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
-                            al_destroy_bitmap(bitmap);
-
-                            for(x = 1; x < lane->mob_length; x++) {
-                                bitmap = al_load_bitmap(GET_BMP(BMP_REINDEER));
-
-                                al_draw_bitmap(
-                                    bitmap, 
-                                    Lane_get_elem_x(lane, p)+x*BLOCK_WIDTH, 
-                                    i*BLOCK_HEIGHT, 
-                                    lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
-                            }
-                            al_destroy_bitmap(bitmap);
-                        } else {
-                            bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
-                            al_draw_bitmap(
-                                bitmap, 
-                                (lane->mob_length-1)*BLOCK_WIDTH+Lane_get_elem_x(lane, p), 
-                                i*BLOCK_HEIGHT, 
-                                lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
-                            al_destroy_bitmap(bitmap);
-
-                            for(x = 0; x < lane->mob_length-1; x++) {
-                                bitmap = al_load_bitmap(GET_BMP(BMP_REINDEER));
-
-                                al_draw_bitmap(
-                                    bitmap, 
-                                    Lane_get_elem_x(lane, p)+x*BLOCK_WIDTH, 
-                                    i*BLOCK_HEIGHT, 
-                                    lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
-                            }
-                            al_destroy_bitmap(bitmap);
-                        }
-
-
-                    }
-                    /*
-                    switch(lane->mob_length) {
-                        case 1:
-                            bitmap = al_load_bitmap("sprites/mob1_64.png");
-                            break;
-                        case 2:
-                            bitmap = al_load_bitmap("sprites/mob2_64.png");
-                            //al_draw_bitmap(bitmap, Lane_get_elem_x(lane, p), i*BLOCK_HEIGHT, 0);
-                            break;
-                        case 3:
-                            bitmap = al_load_bitmap("sprites/mob3_64.png");
-                        default:
-                            break;
-                    }
-                    if(lane->mob_length > 3) {
-
-                        al_draw_filled_rectangle(
-                            Lane_get_elem_x(lane, p) < 0 ? 0 : Lane_get_elem_x(lane, p),
-                            i*BLOCK_HEIGHT,
-                            Lane_get_elem_x_end(lane, p) < 0 ? 0 : Lane_get_elem_x_end(lane, p),
-                            (1 + i)*BLOCK_HEIGHT,
-                            al_map_rgb(red, green, blue));
-                    
-                    } else {
-                        al_draw_bitmap(
-                            bitmap, 
-                            Lane_get_elem_x(lane, p), 
-                            i*BLOCK_HEIGHT, 
-                            lane->step > 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
-                    }
-                    al_destroy_bitmap(bitmap);
-                    */
+                    draw_vehicle(lane, i, p);
                 } else if(lane->type == MOB_LOG) {
-                    if(lane->mob_length == 2) {
-                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
+                    draw_log(lane, i, p);
+                } else if(lane->type == MOB_FINISH) {
+                    if(!is_in_array(level->finishers, p, LVL_FINISHSPOTS)) {
+                        bitmap = al_load_bitmap(GET_BMP(BMP_LILYPAD));
                         al_draw_bitmap(
                             bitmap, 
                             Lane_get_elem_x(lane, p), 
-                            i*BLOCK_HEIGHT, 0);
-                        al_destroy_bitmap(bitmap);
-
-                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_END));
-                        al_draw_bitmap(
-                            bitmap, 
-                            Lane_get_elem_x(lane, p) + BLOCK_WIDTH, 
-                            i*BLOCK_HEIGHT, 0);
-                        al_destroy_bitmap(bitmap);
-                    } else {
-                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
-                        al_draw_bitmap(
-                            bitmap, 
-                            Lane_get_elem_x(lane, p), 
-                            i*BLOCK_HEIGHT, 0);
-                        al_destroy_bitmap(bitmap);
-
-                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_BODY));
-                        uint8_t j = 0;
-                        for(j = 1; j < lane->mob_length - 1; j++) {
-                            al_draw_bitmap(
-                                bitmap, 
-                                Lane_get_elem_x(lane, p) + j*BLOCK_WIDTH, 
-                                i*BLOCK_HEIGHT, 0);
-                        }
-                        al_destroy_bitmap(bitmap);
-                        
-                        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_END));
-                        al_draw_bitmap(
-                            bitmap, 
-                            Lane_get_elem_x(lane, p) + (lane->mob_length-1)*BLOCK_WIDTH, 
-                            i*BLOCK_HEIGHT, 0);
+                            0, 0);
                         al_destroy_bitmap(bitmap);
                     }
-                } else if(lane->type == MOB_FINISH) {
-                    bitmap = al_load_bitmap(GET_BMP(BMP_LILYPAD));
-                    al_draw_bitmap(
-                        bitmap, 
-                        Lane_get_elem_x(lane, p), 
-                        0, 0);
-                    al_destroy_bitmap(bitmap);
-                } else {
-                    al_draw_filled_rectangle(
-                        Lane_get_elem_x(lane, p) < 0 ? 0 : Lane_get_elem_x(lane, p),
-                        i*BLOCK_HEIGHT,
-                        Lane_get_elem_x_end(lane, p) < 0 ? 0 : Lane_get_elem_x_end(lane, p),
-                        (1 + i)*BLOCK_HEIGHT,
-                        al_map_rgb(red, green, blue));
                 }
             }
         }
-        
     }
     
     uint16_t frogx = level->frog->x;
     uint16_t frogy = level->frog->lane;
     bitmap = al_load_bitmap(GET_BMP(BMP_FROG));
 
-    /*al_draw_filled_rectangle(frogx, frogy*BLOCK_WIDTH, frogx + BLOCK_WIDTH, (frogy + 1)*BLOCK_HEIGHT, 
-                            al_map_rgb(0, 255, 0));
-                            */
     al_draw_bitmap(bitmap, frogx, frogy*BLOCK_HEIGHT, 0);
     al_destroy_bitmap(bitmap);
 
-    laneptr_t finisherlane = level->lanes[0];
-    for(i = 0; i < LVL_FINISHSPOTS; i++) {
-        al_draw_filled_rectangle(
-            Lane_get_elem_x(finisherlane, level->finishers[i]),
-            0,
-            Lane_get_elem_x_end(finisherlane, level->finishers[i]),
-            BLOCK_HEIGHT,
-            al_map_rgb(255, 255, 0)); 
-    }
-    
     bitmap = al_load_bitmap(GET_BMP(BMP_HEART));
     for(i = 0; i < level->frog->lives; i++) {
         al_draw_bitmap(bitmap, (LEVEL_WIDTH-1-i)*BLOCK_WIDTH, (LEVEL_HEIGHT-1)*BLOCK_HEIGHT, 0);
@@ -438,14 +296,21 @@ static void render_map(levelptr_t level) {
     al_destroy_bitmap(bitmap);
 }
 
+
+
 static void draw_score(uint32_t score) {
     ALLEGRO_FONT* font = al_create_builtin_font();
+
+    font = al_load_ttf_font(SELECTED_FONT, 28, 0);
     al_draw_textf(font,al_map_rgb(0,0,0), 
         BLOCK_WIDTH/2,
         (LEVEL_HEIGHT-0.5)*BLOCK_HEIGHT,
         0,"SCORE: %d", score);
     al_destroy_font(font);
 }
+
+
+
 
 static void render_street_lane(levelptr_t level, uint8_t lanenum) {
     uint16_t x = 0;
@@ -460,6 +325,7 @@ static void render_street_lane(levelptr_t level, uint8_t lanenum) {
 }
 
 
+
 static void render_water_lane(levelptr_t level, uint8_t lanenum) {
     uint16_t x = 0;
 
@@ -468,4 +334,116 @@ static void render_water_lane(levelptr_t level, uint8_t lanenum) {
         al_draw_bitmap(bitmap, x, lanenum*BLOCK_HEIGHT, 0);
     }
     al_destroy_bitmap(bitmap);
+}
+
+
+
+static void render_floor_lane(levelptr_t level, uint8_t lanenum) {
+    uint16_t x = 0;
+
+    bitmap = al_load_bitmap(GET_BMP(BMP_FLOOR));
+    for(x=0; x < DISP_WIDTH; x+=BLOCK_WIDTH) {
+        al_draw_bitmap(bitmap, x, lanenum*BLOCK_HEIGHT, 0);
+    }
+    al_destroy_bitmap(bitmap);
+}
+
+
+
+static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
+    uint8_t x = 0;
+    if(lane->mob_length == 2) {
+        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
+        al_draw_bitmap(
+            bitmap, 
+            Lane_get_elem_x(lane, p), 
+            lanenum*BLOCK_HEIGHT, 0);
+        al_destroy_bitmap(bitmap);
+
+        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_END));
+        al_draw_bitmap(
+            bitmap, 
+            Lane_get_elem_x(lane, p) + BLOCK_WIDTH, 
+            lanenum*BLOCK_HEIGHT, 0);
+        al_destroy_bitmap(bitmap);
+    } else {
+        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
+        al_draw_bitmap(
+            bitmap, 
+            Lane_get_elem_x(lane, p), 
+            lanenum*BLOCK_HEIGHT, 0);
+        al_destroy_bitmap(bitmap);
+
+        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_BODY));
+        uint8_t j = 0;
+        for(j = 1; j < lane->mob_length - 1; j++) {
+            al_draw_bitmap(
+                bitmap, 
+                Lane_get_elem_x(lane, p) + j*BLOCK_WIDTH, 
+                lanenum*BLOCK_HEIGHT, 0);
+        }
+        al_destroy_bitmap(bitmap);
+        
+        bitmap = al_load_bitmap(GET_BMP(BMP_LOG_END));
+        al_draw_bitmap(
+            bitmap, 
+            Lane_get_elem_x(lane, p) + (lane->mob_length-1)*BLOCK_WIDTH, 
+            lanenum*BLOCK_HEIGHT, 0);
+        al_destroy_bitmap(bitmap);
+    }
+}
+
+
+
+static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p) {
+    uint8_t x = 0;
+    if(lane->mob_length == 1) {
+        bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
+        al_draw_bitmap(
+            bitmap, 
+            Lane_get_elem_x(lane, p), 
+            lanenum*BLOCK_HEIGHT, 
+            lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
+        al_destroy_bitmap(bitmap);
+    } else {
+        if(lane->step > 0) {
+            bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
+            al_draw_bitmap(
+                bitmap, 
+                Lane_get_elem_x(lane, p), 
+                lanenum*BLOCK_HEIGHT, 
+                lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
+            al_destroy_bitmap(bitmap);
+
+            for(x = 1; x < lane->mob_length; x++) {
+                bitmap = al_load_bitmap(GET_BMP(BMP_REINDEER));
+
+                al_draw_bitmap(
+                    bitmap, 
+                    Lane_get_elem_x(lane, p)+x*BLOCK_WIDTH, 
+                    lanenum*BLOCK_HEIGHT, 
+                    lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
+            }
+            al_destroy_bitmap(bitmap);
+        } else {
+            bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));
+            al_draw_bitmap(
+                bitmap, 
+                (lane->mob_length-1)*BLOCK_WIDTH+Lane_get_elem_x(lane, p), 
+                lanenum*BLOCK_HEIGHT, 
+                lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
+            al_destroy_bitmap(bitmap);
+
+            for(x = 0; x < lane->mob_length-1; x++) {
+                bitmap = al_load_bitmap(GET_BMP(BMP_REINDEER));
+
+                al_draw_bitmap(
+                    bitmap, 
+                    Lane_get_elem_x(lane, p)+x*BLOCK_WIDTH, 
+                    lanenum*BLOCK_HEIGHT, 
+                    lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
+            }
+            al_destroy_bitmap(bitmap);
+        }
+    }
 }

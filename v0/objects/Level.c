@@ -6,7 +6,6 @@ static void generate_car_lane(laneptr_t lane, uint8_t diff);
 static void generate_log_lane(laneptr_t lane, uint8_t diff);
 static void generate_floor_lane(laneptr_t lane);
 static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish);
-static uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len);
 static void Level_generate(levelptr_t level);
 
 

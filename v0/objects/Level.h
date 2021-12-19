@@ -31,6 +31,6 @@ void Level_reset(levelptr_t level);
 //void Level_gen(levelptr_t level);
 uint8_t Level_process_collisions(levelptr_t level, float volume);
 uint8_t Level_delete(levelptr_t level);
-
+uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len);
 
 #endif
