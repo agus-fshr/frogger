@@ -46,31 +46,15 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     
     process_game_state(eng, system_input);
 
-    if(eng->state == GAME_STA_PLAY) {
-        for(i = 0; i < LEVEL_HEIGHT; i++) {
-            Lane_tick(eng->level->lanes[i]);
-        }
-    }
     //printf("%d %d %d %d %d\n", eng->state, eng->playstate, eng->pausestate, eng->menustate, eng->deathstate);
     if(eng->state == GAME_STA_EXIT) {
         return 1;
     }
-    laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
-    if(lane->type == MOB_LOG) {
-        int16_t newx = eng->level->frog->x + lane->step;
-        if((newx > 0) && (newx+REFERENCE_WIDTH < REFERENCE_WIDTH*LEVEL_WIDTH)) {
-            eng->level->frog->x = newx;
-        } else {
-            if(newx < 0) eng->level->frog->x = 0;
-            else eng->level->frog->x = (LEVEL_WIDTH - 1)*REFERENCE_WIDTH;
-        }
-    }
-    
+
     //LEDMatEngine_input(eng);
     LEDMatEngine_render(eng);
-    eng->score += Level_process_collisions(eng->level, eng->volume);
     
-    printf("%d\n", eng->score);
+    //printf("%d\n", eng->score);
     usleep(1000000/48);
     
     return 0;

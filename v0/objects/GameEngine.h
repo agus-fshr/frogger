@@ -1,6 +1,7 @@
 #ifndef __GAME_ENGINE_H
 #define __GAME_ENGINE_H
 #include "Level.h"
+#include <stdio.h>
 
 
 typedef enum {
@@ -81,11 +82,15 @@ typedef  engine_t * engineptr_t;
 void initialize_game_status(engineptr_t eng);
 void engine_init_wrapper(engineptr_t eng);
 void engine_destroy_wrapper(engineptr_t eng);
+
+
 void process_game_state(engineptr_t eng, input_t input);
 void process_menu_state(engineptr_t eng, input_t input);
 void process_pause_state(engineptr_t eng, input_t input);
 void process_death_state(engineptr_t eng, input_t input);
 void process_play_state(engineptr_t eng, input_t input);
 void process_exit_state(engineptr_t eng, input_t input);
+
 float scale_width(int16_t width, int16_t block_width);
+
 #endif

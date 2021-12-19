@@ -1,5 +1,10 @@
 #include "GameEngine.h"
 
+void manage_score(engineptr_t eng);
+
+
+static FILE* highscorefile;
+
 void initialize_game_status(engineptr_t eng) {
     eng->state = GAME_STA_MENU;
     eng->deathstate = DEATH_STA_MENU_OP_1;
@@ -11,6 +16,7 @@ void initialize_game_status(engineptr_t eng) {
 }
 
 void process_game_state(engineptr_t eng, input_t input) {
+
     switch(eng->state) {
         case GAME_STA_MENU:
             process_menu_state(eng, input);
@@ -122,6 +128,37 @@ void process_death_state(engineptr_t eng, input_t input) {
 }
 
 void process_play_state(engineptr_t eng, input_t input) {
+    uint8_t i = 0;
+
+    if(eng->playstate == PLAY_STA_INIT) {
+        eng->playstate = PLAY_STA_1;
+        Level_reset(eng->level);
+    }
+    if(eng->level->frog->lives == 0) {
+        eng->state = GAME_STA_DEATH;
+        eng->deathstate = DEATH_STA_MENU_OP_1;
+        return;
+    }
+
+    for(i = 0; i < LEVEL_HEIGHT; i++) {
+        Lane_tick(eng->level->lanes[i]);
+    }
+
+    laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
+
+    if(lane->type == MOB_LOG) {
+        int16_t newx = eng->level->frog->x + lane->step;
+        if((newx > 0) && (newx+REFERENCE_WIDTH < REFERENCE_WIDTH*LEVEL_WIDTH)) {
+            eng->level->frog->x = newx;
+        } else {
+            if(newx < 0) eng->level->frog->x = 0;
+            else eng->level->frog->x = (LEVEL_WIDTH - 1)*REFERENCE_WIDTH;
+        }
+    }
+    
+    eng->score += Level_process_collisions(eng->level, eng->volume);
+    manage_score(eng);
+
     switch(input) {
         case INPUT_UP:
             if(eng->level->frog->lane >= 1)
@@ -162,23 +199,17 @@ void process_play_state(engineptr_t eng, input_t input) {
         default:
             break;
     }
-    if(eng->playstate == PLAY_STA_INIT) {
-        eng->playstate = PLAY_STA_1;
-        Level_reset(eng->level);
-    }
-    if(eng->level->frog->lives == 0) {
-        eng->state = GAME_STA_DEATH;
-        eng->deathstate = DEATH_STA_MENU_OP_1;
-    }
 }
 
 void engine_destroy_wrapper(engineptr_t eng) {
     eng->destroy(eng);
     Level_delete(eng->level);
+    fclose(highscorefile);
     free(eng);
 }
 
 void engine_init_wrapper(engineptr_t eng) {
+    highscorefile = fopen("highscore.txt", "w+");
     initialize_game_status(eng);
     eng->level = malloc(sizeof(level_t));
     Level_init(eng->level);
@@ -188,4 +219,14 @@ void engine_init_wrapper(engineptr_t eng) {
 
 float scale_width(int16_t width, int16_t block_width) {
     return width*block_width/REFERENCE_WIDTH;
+}
+
+void manage_score(engineptr_t eng) {
+    fseek(highscorefile, 0, SEEK_SET);
+    uint32_t highscore;
+    fread(&highscore, sizeof(uint32_t), 1, highscorefile);
+    if(eng->score > highscore) {
+        fwrite(&eng->score, sizeof(uint32_t), 1, highscorefile);
+        fflush(highscorefile);
+    }
 }
