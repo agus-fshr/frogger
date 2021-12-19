@@ -5,6 +5,7 @@
 #include "../config.h"
 #include "../libs/joydisp/joydrv.h"
 #include "../libs/joydisp/disdrv.h"
+#include "../libs/LEDlib.h"
 #include <unistd.h>
 
 #define BLOCK_HEIGHT (1)

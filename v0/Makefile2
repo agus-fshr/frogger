@@ -1,5 +1,7 @@
-frogger: main.o Frog.o Level.o Lane.o LEDMatrixEngine.o GameEngine.o
-	gcc main.o Frog.o Level.o Lane.o LEDMatrixEngine.o GameEngine.o libs/joydisp/disdrv.o libs/joydisp/joydrv.o -o frogger -g
+
+frogger: main.o Frog.o Level.o Lane.o LEDMatrixEngine.o GameEngine.o LEDlib.o	
+	$(OS)
+	gcc main.o Frog.o Level.o Lane.o LEDMatrixEngine.o LEDlib.o GameEngine.o libs/joydisp/disdrv.o libs/joydisp/joydrv.o -o frogger -g
 
 main.o: main.c objects/Lane.h objects/Level.h objects/GameEngine.h config.h
 	gcc -c main.c -o main.o -D LEDMAT
@@ -13,8 +15,11 @@ Lane.o: objects/Lane.c objects/Lane.h
 Level.o: objects/Level.c objects/Level.h objects/Frog.h objects/Lane.h config.h
 	gcc -c objects/Level.c -o Level.o -D LEDMAT
 
-LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h
+LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h
 	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o
+
+LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
+	gcc -c libs/LEDlib.c -o LEDlib.o
 
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
 	gcc -c objects/GameEngine.c -o GameEngine.o

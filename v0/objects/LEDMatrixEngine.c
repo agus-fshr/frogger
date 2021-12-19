@@ -6,27 +6,27 @@ static void render_pause(engineptr_t eng);
 static void render_menu(engineptr_t eng);
 static void render_death(engineptr_t eng);
 static void LEDMatEngine_render(engineptr_t eng);
-static void LEDMatEngine_input(engineptr_t eng);
-static void disp_write_sanitized(dcoord_t coord, dlevel_t val);
-static void disp_clear_buf();
+static input_t LEDMatEngine_input(engineptr_t eng);
+
+
+const dlevel_t arrow_up[BMP_WIDTH*BMP_HEIGHT] = {
+    D_OFF, D_OFF, D_ON, D_OFF, D_OFF,
+    D_OFF, D_ON, D_ON, D_ON, D_OFF,
+    D_ON, D_ON, D_ON, D_ON, D_ON,
+    D_OFF, D_OFF, D_OFF, D_OFF, D_OFF,
+    D_OFF, D_OFF, D_OFF, D_OFF, D_OFF
+};
+    
+const dlevel_t arrow_down[BMP_WIDTH*BMP_HEIGHT] = {
+    D_OFF, D_OFF, D_OFF, D_OFF, D_OFF,
+    D_OFF, D_OFF, D_OFF, D_OFF, D_OFF,
+    D_ON, D_ON, D_ON, D_ON, D_ON,
+    D_OFF, D_ON, D_ON, D_ON, D_OFF,
+    D_OFF, D_OFF, D_ON, D_OFF, D_OFF
+};
 
 static dcoord_t dcoord;
 
-static void disp_write_sanitized(dcoord_t coord, dlevel_t val) {
-    if(coord.x <= DISP_MAX_X && coord.y <= DISP_MAX_Y) {
-        disp_write(coord, val);
-    }
-}
-static void disp_clear_buf() {
-    uint8_t i = 0, j = 0;
-    for(i = 0; i <= DISP_MAX_X; i++) {
-        dcoord.x = i;
-        for(j = 0; j <= DISP_MAX_Y; j++) {
-            dcoord.y = j;
-            disp_write(dcoord, D_OFF);
-        }
-    }
-}
 
 int LEDMatEngine_init(engineptr_t eng) {
     joy_init();
@@ -42,8 +42,10 @@ int LEDMatEngine_destroy(engineptr_t eng){
 
 int LEDMatEngine_gameloop(engineptr_t eng) {
     uint8_t i = 0;
+    input_t system_input = LEDMatEngine_input(eng);
+    
+    process_game_state(eng, system_input);
 
-    process_game_state(eng, INPUT_NULL);
     if(eng->state == GAME_STA_PLAY) {
         for(i = 0; i < LEVEL_HEIGHT; i++) {
             Lane_tick(eng->level->lanes[i]);
@@ -64,10 +66,11 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
         }
     }
     
-    LEDMatEngine_input(eng);
+    //LEDMatEngine_input(eng);
     LEDMatEngine_render(eng);
     eng->score += Level_process_collisions(eng->level, eng->volume);
     
+    printf("%d\n", eng->score);
     usleep(1000000/48);
     
     return 0;
@@ -107,49 +110,142 @@ static void LEDMatEngine_render(engineptr_t eng) {
 
 }
 
-static void LEDMatEngine_input(engineptr_t eng) {
+static input_t LEDMatEngine_input(engineptr_t eng) {
+    static input_t last_input = INPUT_NULL;
+    static jswitch_t last_switch = J_NOPRESS;
+
     levelptr_t level = eng->level;
     joy_update();
     jcoord_t coord = joy_get_coord();
     jswitch_t sw = joy_get_switch();
-
-    uint8_t joyup = coord.y > DEADZONE;
-    uint8_t joydown = coord.y < -DEADZONE;
-    uint8_t joyright = coord.x > DEADZONE;
-    uint8_t joyleft = coord.x < -DEADZONE;
+    input_t actual_input = INPUT_NULL;
     
-    if(joyup)
-        process_game_state(eng, INPUT_UP);
-    else if(joydown)
-        process_game_state(eng, INPUT_DOWN);
-    else if(joyleft)
-        process_game_state(eng, INPUT_LEFT);
-    else if(joyright)
-        process_game_state(eng, INPUT_RIGHT);
-
-    if(sw == J_PRESS)
+    if(sw == J_PRESS && last_switch == J_NOPRESS) {
         process_game_state(eng, INPUT_ENTER);
-        
-    if(joyup || joydown || joyleft || joyright) {
+    }
+    last_switch = sw;
+     
+    if(actual_input != INPUT_NULL && actual_input != INPUT_ENTER) {
         //sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
+    }
+
+    if(coord.y > DEADZONE)
+        actual_input = INPUT_UP;
+    else if(coord.y < -DEADZONE)
+        actual_input = INPUT_DOWN;
+    else if(coord.x > DEADZONE)
+        actual_input = INPUT_RIGHT;
+    else if(coord.x < -DEADZONE)
+        actual_input = INPUT_LEFT;
+
+    if(sw != last_switch) {
+        last_switch = sw;
+        actual_input = sw == J_PRESS ? INPUT_ENTER : INPUT_NULL;
+    }
+
+    if(actual_input != last_input) {
+        last_input = actual_input;
+        return actual_input;
+    } else {
+        return INPUT_NULL;
     }
 }
 
 static void render_pause(engineptr_t eng) {
+    dcoord.x = 1;
+    dcoord.y = 6;
+
+    if(eng->pausestate == PAUSE_STA_OP_1) {
+        write_word("RES", dcoord, 3);
+    } else if(eng->pausestate == PAUSE_STA_OP_2) {
+        write_word("RST", dcoord, 3);
+    } else if(eng->pausestate == PAUSE_STA_OP_3) {
+        write_word("EXT", dcoord, 3);
+    }
+
+    dcoord.y = 0;
+    dcoord.x = 5;
+    write_bmp(arrow_up, dcoord);
+
+
+    dcoord.y = DISP_MAX_Y-4;
+    dcoord.x = 5;
+    write_bmp(arrow_down, dcoord);
+
+
+    dcoord.y = DISP_MAX_Y+1;
+    dcoord.x = DISP_MAX_X;
+    while(dcoord.y > 0) {
+        dcoord.y--;
+        disp_write_sanitized(dcoord, (eng->score >> dcoord.y) & 1 ? D_ON : D_OFF);
+    }
+
+    dcoord.y = 0;
     dcoord.x = 0;
-    dcoord.y = eng->pausestate;
-    disp_write_sanitized(dcoord, D_ON);
+    while(dcoord.y < eng->level->frog->lives) {
+        disp_write_sanitized(dcoord, D_ON);
+        dcoord.y++;
+    }
 }
+
 static void render_menu(engineptr_t eng) {
-    dcoord.x = 8;
-    dcoord.y = 8 + eng->menustate;
-    disp_write_sanitized(dcoord, D_ON);
+    dcoord.x = 1;
+    dcoord.y = 6;
+    if(eng->menustate == MENU_STA_OP_1) {
+        write_word("PLY", dcoord, 3);
+    } else if(eng->menustate == MENU_STA_OP_2) {
+        write_word("QIT", dcoord, 3);
+    }
+
+    dcoord.y = 0;
+    dcoord.x = 5;
+    write_bmp(arrow_up, dcoord);
+
+
+    dcoord.y = DISP_MAX_Y-4;
+    dcoord.x = 5;
+    write_bmp(arrow_down, dcoord);
+
+    /*
+    dcoord.y = DISP_MAX_Y;
+    dcoord.x = DISP_MAX_X;
+    while(dcoord.y > 0) {
+        disp_write_sanitized(dcoord, (eng->score >> dcoord.y) & 1 ? D_ON : D_OFF);
+        dcoord.y--;
+    }
+    */
+    //disp_write_sanitized(dcoord, D_ON);
+    //write_letter('E', dcoord);
+    
 }
+
 static void render_death(engineptr_t eng) {
-    dcoord.x = 0;
-    dcoord.y = eng->deathstate;
-    disp_write_sanitized(dcoord, D_ON);
+    dcoord.x = 1;
+    dcoord.y = 6;
+    if(eng->deathstate == DEATH_STA_MENU_OP_1) {
+        write_word("TRY", dcoord, 3);
+    } else if(eng->deathstate == DEATH_STA_MENU_OP_2) {
+        write_word("EXT", dcoord, 3);
+    }
+
+    dcoord.y = 0;
+    dcoord.x = 5;
+    write_bmp(arrow_up, dcoord);
+
+
+    dcoord.y = DISP_MAX_Y-4;
+    dcoord.x = 5;
+    write_bmp(arrow_down, dcoord);
+
+    
+    dcoord.y = DISP_MAX_Y;
+    dcoord.x = DISP_MAX_X;
+    while(dcoord.y > 0) {
+        disp_write_sanitized(dcoord, (eng->score >> dcoord.y) & 1 ? D_ON : D_OFF);
+        dcoord.y--;
+    }
 }
+
 static void render_map(levelptr_t level) {
     static uint8_t flicker = 0;
 
@@ -166,22 +262,18 @@ static void render_map(levelptr_t level) {
                     dcoord.x += BLOCK_WIDTH;
                 }
             }
-            for(p = -1; p < (LEVEL_WIDTH / lane->delta) + 2; p++) {
+            for(p = -2; p < (LEVEL_WIDTH / lane->delta) + 2; p++) {
                 
-                if(lane->type == MOB_CAR) {
-                    dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
-                    //printf("%d %d\n", Lane_get_elem_x(lane, p), dcoord.x);
-                    int8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
-                    while(dcoord.x < limit_x){
-                        disp_write_sanitized(dcoord, D_ON);
-                        dcoord.x += BLOCK_WIDTH;
-                    }
-                } else if(lane->type == MOB_LOG) {
-                    dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
-                    uint8_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
-                    while(dcoord.x < limit_x){
-                        disp_write_sanitized(dcoord, D_OFF);
-                        dcoord.x += BLOCK_WIDTH;
+                if(lane->type == MOB_CAR || lane->type == MOB_LOG) {
+                    dlevel_t val = lane->type == MOB_CAR ? D_ON : D_OFF;
+                    int16_t pretended_x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);                    
+                    int16_t limit_x = scale_width(Lane_get_elem_x_end(lane, p), BLOCK_WIDTH);
+                    //printf("%d %d %d %d %d\n", i, p, Lane_get_elem_x(lane, p), pretended_x, limit_x);
+                    while(pretended_x < limit_x){
+                        //printf("%d %d %d %d %d\n", i, p, Lane_get_elem_x(lane, p), pretended_x, limit_x);
+                        dcoord.x = pretended_x;
+                        disp_write_sanitized(dcoord, val);
+                        pretended_x += BLOCK_WIDTH;
                     }
                 } else if(lane->type == MOB_FINISH) {
                     dcoord.x = scale_width(Lane_get_elem_x(lane, p), BLOCK_WIDTH);
@@ -189,25 +281,20 @@ static void render_map(levelptr_t level) {
                 }
             }
         }
-        
     }
     
-    if(flicker++ == 2) {
-        dcoord.x = scale_width(level->frog->x, BLOCK_WIDTH);
-        dcoord.y = level->frog->lane;
-        disp_write_sanitized(dcoord, D_ON);
+    dcoord.x = scale_width(level->frog->x, BLOCK_WIDTH);
+    dcoord.y = level->frog->lane;
+    disp_write_sanitized(dcoord, flicker == 1 ? D_ON : D_OFF);
+    if(flicker == 2) {
         flicker = 0;
     }
-    /*
+    flicker++;
+    
     laneptr_t finisherlane = level->lanes[0];
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
-        al_draw_filled_rectangle(
-            Lane_get_elem_x(finisherlane, level->finishers[i]),
-            0,
-            Lane_get_elem_x_end(finisherlane, level->finishers[i]),
-            BLOCK_HEIGHT,
-            al_map_rgb(255, 255, 0)); 
+        dcoord.x = scale_width(Lane_get_elem_x(finisherlane, level->finishers[i]), BLOCK_WIDTH),
+        dcoord.y = 0;
+        disp_write_sanitized(dcoord, D_OFF);
     }
-    */
-
 }

@@ -84,6 +84,7 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
 
     if(car_collision || log_collision || finisher_collision) {
         if(Frog_kill(level->frog) == 0) {
+            Frog_move(level->frog, SPAWN_X, SPAWN_Y);
             done = 1;
         }
         else {

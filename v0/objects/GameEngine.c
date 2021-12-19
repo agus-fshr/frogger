@@ -36,11 +36,9 @@ void process_game_state(engineptr_t eng, input_t input) {
 void process_menu_state(engineptr_t eng, input_t input) {
     switch(input) {
         case INPUT_UP:
-            if(eng->menustate == MENU_STA_OP_2) eng->menustate = MENU_STA_OP_1;
-            break;
-        
         case INPUT_DOWN:
-            if(eng->menustate == MENU_STA_OP_1) eng->menustate = MENU_STA_OP_2;
+            if(eng->menustate == MENU_STA_OP_2) eng->menustate = MENU_STA_OP_1;
+            else if(eng->menustate == MENU_STA_OP_1) eng->menustate = MENU_STA_OP_2;
             break;
 
         case INPUT_ENTER:
@@ -61,11 +59,13 @@ void process_pause_state(engineptr_t eng, input_t input) {
         case INPUT_UP:
             if(eng->pausestate == PAUSE_STA_OP_2) eng->pausestate = PAUSE_STA_OP_1;
             else if(eng->pausestate == PAUSE_STA_OP_3) eng->pausestate = PAUSE_STA_OP_2;
+            else if(eng->pausestate == PAUSE_STA_OP_1) eng->pausestate = PAUSE_STA_OP_3;
             break;
         
         case INPUT_DOWN:
             if(eng->pausestate == PAUSE_STA_OP_1) eng->pausestate = PAUSE_STA_OP_2;
             else if(eng->pausestate == PAUSE_STA_OP_2) eng->pausestate = PAUSE_STA_OP_3;
+            else if(eng->pausestate == PAUSE_STA_OP_3) eng->pausestate = PAUSE_STA_OP_1;
             break;
         
         case INPUT_LEFT:
@@ -103,11 +103,9 @@ void process_death_state(engineptr_t eng, input_t input) {
     
     switch(input) {
         case INPUT_UP:
-            if(eng->deathstate == DEATH_STA_MENU_OP_2) eng->deathstate = DEATH_STA_MENU_OP_1;
-            break;
-        
         case INPUT_DOWN:
-            if(eng->deathstate == DEATH_STA_MENU_OP_1) eng->deathstate = DEATH_STA_MENU_OP_2;
+            if(eng->deathstate == DEATH_STA_MENU_OP_2) eng->deathstate = DEATH_STA_MENU_OP_1;
+            else if(eng->deathstate == DEATH_STA_MENU_OP_1) eng->deathstate = DEATH_STA_MENU_OP_2;
             break;
 
         case INPUT_ENTER:
@@ -188,6 +186,6 @@ void engine_init_wrapper(engineptr_t eng) {
     eng->init(eng);
 }
 
-float scale_width(uint16_t width, uint16_t block_width) {
+float scale_width(int16_t width, int16_t block_width) {
     return width*block_width/REFERENCE_WIDTH;
 }
