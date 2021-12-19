@@ -34,6 +34,12 @@ AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/sound.h ob
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
 	gcc -c objects/GameEngine.c -o GameEngine.o
 
+LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h
+	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o
+
+LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
+	gcc -c libs/LEDlib.c -o LEDlib.o
+	
 sound.o: libs/sound.c libs/sound.h
 	gcc -c libs/sound.c -o sound.o
 

@@ -8,7 +8,7 @@ static void render_death(engineptr_t eng);
 static void render_street_lane(levelptr_t level, uint8_t lanenum);
 static void render_water_lane(levelptr_t level, uint8_t lanenum);
 static void draw_score(uint32_t score);
-static void AllegroEngine_input(engineptr_t eng, int key);
+static input_t AllegroEngine_input(engineptr_t eng, int key);
 static void AllegroEngine_render(engineptr_t eng);
 
 static ALLEGRO_DISPLAY* disp;
@@ -67,36 +67,19 @@ int AllegroEngine_gameloop(engineptr_t eng) {
         case ALLEGRO_EVENT_TIMER:
             process_game_state(eng, INPUT_NULL);
             
-            if(eng->state == GAME_STA_PLAY) {
-                for(i = 0; i < LEVEL_HEIGHT; i++) {
-                    Lane_tick(eng->level->lanes[i]);
-                }
-            } else if(eng->state == GAME_STA_EXIT) {
+            if(eng->state == GAME_STA_EXIT) {
                 return 1;
             }
-            
-            laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
-            if(lane->type == MOB_LOG) {
-                int16_t newx = eng->level->frog->x + lane->step;
-                if((newx > 0) && (newx+REFERENCE_WIDTH < REFERENCE_WIDTH*LEVEL_WIDTH)) {
-                    eng->level->frog->x = newx;
-                } else {
-                    if(newx < 0) eng->level->frog->x = 0;
-                    else eng->level->frog->x = (LEVEL_WIDTH - 1)*REFERENCE_WIDTH;
-                }
-            }
-
             if(&background_music) {
                 ALLEGRO_SAMPLE_INSTANCE* bgmusic_ins = al_lock_sample_id(&background_music);
                 al_set_sample_instance_gain(bgmusic_ins, eng->volume);
                 al_unlock_sample_id(&background_music);
             }
-            
             redraw = 1;
             break;
     
         case ALLEGRO_EVENT_KEY_DOWN:
-            AllegroEngine_input(eng, event.keyboard.keycode);
+            process_game_state(eng, AllegroEngine_input(eng, event.keyboard.keycode));
             break;
 
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -111,7 +94,6 @@ int AllegroEngine_gameloop(engineptr_t eng) {
         //printf("%d\n", level->frog->lives);
         //printf("%d\n", level->number);
         /*done = */
-        eng->score += Level_process_collisions(eng->level, eng->volume);
         redraw = 0;
     }
     return 0;
@@ -139,31 +121,9 @@ static void AllegroEngine_render(engineptr_t eng) {
     al_flip_display();
 }
 
-static void AllegroEngine_input(engineptr_t eng, int key) {
+static input_t AllegroEngine_input(engineptr_t eng, int key) {
     levelptr_t level = eng->level;
-
     switch(key) {
-        case ALLEGRO_KEY_UP:
-            process_game_state(eng, INPUT_UP);
-            break;
-
-        case ALLEGRO_KEY_DOWN:
-            process_game_state(eng, INPUT_DOWN);
-            break;
-
-        case ALLEGRO_KEY_LEFT:
-            process_game_state(eng, INPUT_LEFT);
-            break;
-
-        case ALLEGRO_KEY_RIGHT:
-            process_game_state(eng, INPUT_RIGHT);
-            break;
-
-        case ALLEGRO_KEY_P:
-        case ALLEGRO_KEY_ENTER:
-            process_game_state(eng, INPUT_ENTER);
-            break;
-        
         #ifdef CHEAT
             case ALLEGRO_KEY_B:
                 level->number -= 2;
@@ -185,6 +145,12 @@ static void AllegroEngine_input(engineptr_t eng, int key) {
             key == ALLEGRO_KEY_RIGHT) {
         sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
+    if(key == ALLEGRO_KEY_UP) return INPUT_UP;
+    if(key == ALLEGRO_KEY_DOWN) return INPUT_DOWN;
+    if(key == ALLEGRO_KEY_LEFT) return INPUT_LEFT;
+    if(key == ALLEGRO_KEY_RIGHT) return INPUT_RIGHT;
+    if(key == ALLEGRO_KEY_ENTER) return INPUT_ENTER;
+    return INPUT_NULL;
 }
 
 static void render_pause(engineptr_t eng) {
