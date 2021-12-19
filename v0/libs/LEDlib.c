@@ -15,175 +15,175 @@ static const dlevel_t* get_letter(char c);
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
-const dlevel_t LETTER_A[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_A[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_OFF, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_B[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_B[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_ON
 };
-const dlevel_t LETTER_C[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_C[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_OFF, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_OFF, D_ON, D_ON, D_ON
 };
-const dlevel_t LETTER_D[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_D[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_OFF, D_OFF, D_OFF, D_ON,
     D_OFF, D_OFF, D_OFF, D_ON,
     D_OFF, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_E[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_E[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_ON, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_ON, D_ON, D_ON
 };
-const dlevel_t LETTER_F[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_F[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF
 };
-const dlevel_t LETTER_G[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_G[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_OFF, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_H[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_H[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_I[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_I[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_ON, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_J[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_J[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_OFF, D_OFF, D_OFF, D_ON,
     D_OFF, D_OFF, D_OFF, D_ON,
     D_OFF, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_OFF, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_K[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_K[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_ON, D_OFF,
     D_ON, D_ON, D_OFF, D_OFF,
     D_ON, D_OFF, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_L[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_L[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF,
     D_ON, D_ON, D_ON, D_ON
 };
-const dlevel_t LETTER_M[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_M[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_N[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_N[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_OFF, D_ON,
     D_ON, D_ON, D_OFF, D_ON,
     D_ON, D_OFF, D_ON, D_ON,
     D_ON, D_OFF, D_ON, D_ON
 };
-const dlevel_t LETTER_O[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_O[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_ON
 };
-const dlevel_t LETTER_P[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_P[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_OFF
 };
-const dlevel_t LETTER_Q[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_Q[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_ON, D_OFF,
     D_ON, D_OFF, D_ON, D_OFF,
     D_ON, D_ON, D_ON, D_OFF,
     D_OFF, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_R[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_R[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_S[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_S[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_OFF, D_ON, D_ON, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_OFF, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_T[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_T[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF
 };
-const dlevel_t LETTER_U[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_U[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_OFF, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_V[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_V[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON,
     D_OFF, D_ON, D_ON, D_OFF,
     D_OFF, D_ON, D_ON, D_OFF
 };
-const dlevel_t LETTER_X[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_X[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_OFF, D_ON,
     D_OFF, D_ON, D_ON, D_OFF,
     D_OFF, D_ON, D_ON, D_OFF,
     D_ON, D_OFF, D_OFF, D_ON,
     D_ON, D_OFF, D_OFF, D_ON
 };
-const dlevel_t LETTER_Y[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_Y[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_OFF, D_ON, D_OFF,
     D_ON, D_OFF, D_ON, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_OFF, D_OFF
 };
-const dlevel_t LETTER_Z[LETTER_HEIGHT][LETTER_WIDTH] = {
+const dlevel_t LETTER_Z[LETTER_HEIGHT*LETTER_WIDTH] = {
     D_ON, D_ON, D_ON, D_ON,
     D_OFF, D_OFF, D_OFF, D_ON,
     D_OFF, D_OFF, D_ON, D_OFF,
