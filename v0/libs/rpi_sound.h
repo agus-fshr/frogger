@@ -1,19 +1,16 @@
 /***************************************************************************//**
-  @file     allegro_sound.h
+  @file     AllegroEngine.h
   @brief    Header de interfaz de audio para Allegro
   @author   Grupo 7
  ******************************************************************************/
-#ifndef __ALLEGRO_SOUND_H
-#define __ALLEGRO_SOUND_H
+#ifndef __RPI_SOUND_H
+#define __RPI_SOUND_H
 
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-
+#include "audio/SDL2/audio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -41,7 +38,7 @@ void sound_init(void);
  * @param mode Loop or once
  * @param ret_id To save reproduction id
 */
-void sound_play(soundfx_t sfx, float volume, ALLEGRO_PLAYMODE mode, ALLEGRO_SAMPLE_ID* ret_id);
+void sound_play(soundfx_t sfx, float volume, uint8_t mode);
 
 /**
  * @brief Destroys sound module

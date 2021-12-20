@@ -39,7 +39,7 @@ void initialize_game_status(engineptr_t eng) {
     eng->pausestate = PAUSE_STA_OP_1;
     eng->playstate = PLAY_STA_INIT;
     eng->exitstate = EXIT_STA_OP_1;
-    eng->volume = .15f;         // Volume is VERY loud
+    eng->volume = 1.0f;         // Volume is VERY loud
 }
 
 
@@ -226,8 +226,9 @@ static void process_play_state(engineptr_t eng, input_t input) {
             else eng->level->frog->x = (LEVEL_WIDTH - 1)*REFERENCE_WIDTH;
         }
     }
-    
-    eng->score += Level_process_collisions(eng->level, eng->volume);
+    uint16_t extra_score;
+    Level_process_collisions(eng->level, &extra_score);
+    eng->score += extra_score;
     manage_score(eng);
 
     switch(input) {

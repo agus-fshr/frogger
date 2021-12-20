@@ -20,6 +20,7 @@
         "gameengine.h": "c",
         "disdrv.h": "c",
         "joydrv.h": "c",
-        "ledlib.h": "c"
+        "ledlib.h": "c",
+        "rpi_sound.h": "c"
     }
 }

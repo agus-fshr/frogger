@@ -33,11 +33,9 @@ uint8_t Level_init(levelptr_t level) {
     
     level->finisher_count = 0;
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
-        level->finishers[i] = -100;
+        level->finishers[i] = OUT_OF_BOUNDS;
     }
     level->number = 0;
-    level->paused = 0;
-    level->score = 0;
     level->lanes = calloc(LEVEL_HEIGHT, sizeof(laneptr_t));
     if(level->lanes == NULL){
         return 0;
@@ -58,9 +56,9 @@ uint8_t Level_init(levelptr_t level) {
             free(level->frog);
             return 0;
         }
-        level->lanes[i]->delta = 100;
-        level->lanes[i]->step = 100;
-        level->lanes[i]->x0 = 100;
+        level->lanes[i]->delta = 1;
+        level->lanes[i]->step = 0;
+        level->lanes[i]->x0 = 0;
         level->lanes[i]->mob_length = 1;
     }
 
@@ -82,9 +80,10 @@ uint8_t Level_delete(levelptr_t level) {
 }
 
 
-uint8_t Level_process_collisions(levelptr_t level, float volume) {
+uint8_t Level_process_collisions(levelptr_t level, uint16_t* extra_score) {
     uint16_t frogy = level->frog->lane;
     uint8_t finish_order;
+    *extra_score = 0;
 
     uint8_t collided = Level_check_collisions(level, &finish_order);
     uint8_t car_collision = collided && level->lanes[frogy]->type == MOB_CAR;
@@ -102,22 +101,21 @@ uint8_t Level_process_collisions(levelptr_t level, float volume) {
         }
     }
 
-    uint8_t sum = 0;
     if(collided && level->lanes[frogy]->type == MOB_FINISH) {
         if(is_in_array(level->finishers, finish_order, LVL_FINISHSPOTS)){
             Frog_kill(level->frog);
         } else {
             level->finishers[level->finisher_count++] = finish_order;
-            sum = 1;
+            *extra_score = 1;
             if(level->finisher_count == LVL_FINISHSPOTS){
-                sum = 5*(level->number + 1);
+                *extra_score = SCORE_MULTIPLIER_LEVEL_COMPLETE*(level->number + 1);
                 Level_next(level);
             } else {
                 Frog_move(level->frog, SPAWN_X, SPAWN_Y);
             }
         }
     }
-    return sum;
+    return car_collision || log_collision;
 }
 
 
@@ -136,7 +134,6 @@ void Level_next(levelptr_t level) {
 
 void Level_reset(levelptr_t level) {
     level->number = 0;
-    level->score = 0;
     Level_next(level);
 }
 
@@ -156,7 +153,7 @@ uint8_t is_in_array(int16_t *arr, int16_t elem, int16_t len) {
  *******************************************************************************
  ******************************************************************************/
 static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
-    float frog_x = ((float) level->frog->x) / REFERENCE_WIDTH;
+    float frog_x = ((float) level->frog->x);
     uint8_t frog_y = level->frog->lane;
     int8_t p = 0; // iterator
     laneptr_t lane = level->lanes[frog_y];
@@ -167,11 +164,12 @@ static uint8_t Level_check_collisions(levelptr_t level, uint8_t* finish) {
         // This could use Lane_get_elem_x and Lane_get_elem_x_end
         // but we had time issues to make it work nicely
         for(p = -1; p < LEVEL_WIDTH / lane->delta + 2; p++) {    
-            float start = ((float) lane->x0)/REFERENCE_WIDTH + p*lane->delta;
-            if(((frog_x+1) > start) && (frog_x < (start + lane->mob_length))) {
+            int16_t start = Lane_get_elem_x(lane, p);//((float) lane->x0)/REFERENCE_WIDTH + p*lane->delta;
+            if(((frog_x+REFERENCE_WIDTH) > start) && (frog_x < (start + lane->mob_length*REFERENCE_WIDTH))) {
                 *finish = p;
                 return 1;
             }
+
         }
     }
     return 0;

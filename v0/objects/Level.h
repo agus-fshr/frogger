@@ -20,6 +20,8 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
+#define SCORE_MULTIPLIER_LEVEL_COMPLETE (5)
+
 #define SPAWN_X (LEVEL_WIDTH*REFERENCE_WIDTH/2)
 #define SPAWN_Y (LEVEL_HEIGHT-1)
 
@@ -59,8 +61,6 @@ typedef struct {
     frogptr_t frog;
     int16_t finishers[LVL_FINISHSPOTS];
     uint8_t finisher_count;
-    uint8_t paused;
-    uint32_t score;
 } level_t;
 
 typedef level_t * levelptr_t;
@@ -90,10 +90,10 @@ void Level_reset(levelptr_t level);
 /**
  * @brief Checks collisions on level's current state
  * @param level Pointer to level
- * @param volume Volume of sound (if such a colission occurs)
- * @return Score earned if collides with target pads
+ * @param extra_score returns earned score if it applies
+ * @return 1 if collision ocurred
  */ 
-uint8_t Level_process_collisions(levelptr_t level, float volume);
+uint8_t Level_process_collisions(levelptr_t level, uint16_t* extra_score);
 
 /**
  * @brief Destroys pointer and frees memory

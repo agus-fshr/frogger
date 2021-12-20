@@ -6,8 +6,8 @@ cheatflags := -D CHEAT
 ifeq ($(machine), armv7l)
 	target = froggerRPi
 	maintarget = mainRPi.o
-	dep = LEDMatrixEngine.o LEDlib.o
-	linkedobj = $(dep) libs/joydisp/disdrv.o libs/joydisp/joydrv.o
+	dep = LEDMatrixEngine.o LEDlib.o rpi_sound.o
+	linkedobj = $(dep) libs/joydisp/disdrv.o libs/joydisp/joydrv.o libs/audio/SDL2/libAudioSDL2.o
 	flag = -D LEDMAT
 else 
 	target = froggerAllegro
@@ -46,6 +46,9 @@ LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
 	
 allegro_sound.o: libs/allegro_sound.c libs/allegro_sound.h
 	gcc -c libs/allegro_sound.c -o allegro_sound.o $(gccflags)
+
+rpi_sound.o: libs/rpi_sound.c libs/rpi_sound.h
+	gcc -c libs/rpi_sound.c -o rpi_sound.o $(gccflags)
 
 clean:
 	rm *.o

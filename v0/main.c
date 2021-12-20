@@ -5,6 +5,7 @@
 
 #ifdef LEDMAT
     #include "objects/LEDMatrixEngine.h"
+    #include "libs/rpi_sound.h"
     #define INIT_FUN (&LEDMatEngine_init)
     #define GAME_FUN (&LEDMatEngine_gameloop)
     #define DESTROY_FUN (&LEDMatEngine_destroy)
@@ -31,6 +32,11 @@ int main()
     engine->destroy = DESTROY_FUN;
     
     engine_init_wrapper(engine);
+
+    #ifdef LEDMAT
+    sound_init();
+    sound_play(SFX_JINGLE, 1.0, 0);
+    #endif
     
     while(!engine->gameloop(engine)) {
         //game loop runs in while condition
