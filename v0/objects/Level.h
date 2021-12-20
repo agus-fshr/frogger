@@ -43,14 +43,14 @@
 #define VEHICLE_DELTA_PER_STEP (0.1)
 #define MIN_VEHICLE_STEP      (2)
 #define DIFF_SCALING_VEHICLE_DELTA(d) (2*(CUT_OFF_DIFFICULTY - (d)))
-#define DIFF_SCALING_VEHICLE_STEP(d)  (5+(d))
+#define DIFF_SCALING_VEHICLE_STEP(d)  (4+(d))
 
 #define MIN_LOG_LENGTH    (2)
 #define MAX_LOG_LENGTH    (7)
 #define MAX_LOG_EXTRA_DELTA (4)
-#define MIN_LOG_STEP      (1)
-#define DIFF_SCALING_LOG_LENGTH(d)  (-(d)/3)
-#define DIFF_SCALING_LOG_STEP(d)    (8+(d))
+#define MIN_LOG_STEP      (2)
+#define DIFF_SCALING_LOG_LENGTH(d)  (MAX_LOG_LENGTH - MIN_LOG_LENGTH - (d)/3)
+#define DIFF_SCALING_LOG_STEP(d)    (8 + (d))
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS

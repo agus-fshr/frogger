@@ -202,8 +202,9 @@ static void process_play_state(engineptr_t eng, input_t input) {
     uint8_t i = 0;
 
     if(eng->playstate == PLAY_STA_INIT) {
-        eng->playstate = PLAY_STA_1;
         Level_reset(eng->level);
+        eng->score = 0;
+        eng->playstate = PLAY_STA_1;
     }
     if(eng->level->frog->lives == 0) {
         eng->state = GAME_STA_DEATH;

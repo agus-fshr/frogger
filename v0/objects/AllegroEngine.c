@@ -88,12 +88,12 @@ int AllegroEngine_destroy(engineptr_t eng){
 
 int AllegroEngine_gameloop(engineptr_t eng) {
     static ALLEGRO_EVENT event;
-    gamestate_t prevstate;
+    //gamestate_t prevstate;
 
     al_wait_for_event(queue, &event);
     switch(event.type) {
         case ALLEGRO_EVENT_TIMER:
-            prevstate = eng->state;
+            //prevstate = eng->state;
             process_game_state(eng, INPUT_NULL);
             /*
             if((eng->state == GAME_STA_DEATH) && (prevstate != GAME_STA_DEATH)){

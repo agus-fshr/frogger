@@ -201,7 +201,7 @@ static void generate_log_lane(laneptr_t lane, uint8_t diff) {
     lane->step = gen_sign() * (MIN_LOG_STEP + rand() % DIFF_SCALING_LOG_STEP(diff));
     lane->mob_length = MIN_LOG_LENGTH;
     if(diff < CUT_OFF_DIFFICULTY)
-         lane->mob_length += (rand() % ((MAX_LOG_LENGTH - MIN_LOG_LENGTH) + DIFF_SCALING_LOG_LENGTH(diff)));
+         lane->mob_length += (rand() % DIFF_SCALING_LOG_LENGTH(diff));
 
     lane->delta = MIN_DELTA(lane) + (rand() % MAX_LOG_EXTRA_DELTA);
     lane->x0 = rand() % ((uint16_t) REFERENCE_WIDTH);
