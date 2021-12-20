@@ -125,6 +125,7 @@ int AllegroEngine_gameloop(engineptr_t eng) {
  *******************************************************************************
  ******************************************************************************/
 static void AllegroEngine_render(engineptr_t eng) {
+    static gamestate_t prevstate = GAME_STA_PLAY;
     switch(eng->state) {
         case GAME_STA_MENU:
             render_menu(eng);
@@ -140,6 +141,8 @@ static void AllegroEngine_render(engineptr_t eng) {
             break;
         
         case GAME_STA_DEATH:
+            if(prevstate != GAME_STA_DEATH)
+                sound_play(SFX_RINGTONE, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
             render_death(eng);
             break;
 
@@ -147,6 +150,7 @@ static void AllegroEngine_render(engineptr_t eng) {
         default:
             break;
     }
+    prevstate = eng->state;
     al_flip_display();
 }
 

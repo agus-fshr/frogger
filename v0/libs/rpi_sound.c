@@ -32,14 +32,11 @@ void sound_init(void) {
 
 
 void sound_play(soundfx_t sfx, float volume, uint8_t mode) {
-    /*ALLEGRO_SAMPLE *sample = al_load_sample(sounds[sfx]);
-    if(sample) {
-        al_play_sample(sample, volume, 0.0, 1.0, mode, 0); // no extra gain nor speeding up.
-    }
-    */
-   playMusic(sounds[SFX_JINGLE], SDL_MIX_MAXVOLUME);
-    // al_destroy_sample(sample);
-    // Leak!
+    playSound(sounds[sfx], SDL_MIX_MAXVOLUME*volume);
+}
+
+void music_play(soundfx_t sfx, float volume, uint8_t mode) {
+    playSound(sounds[sfx], SDL_MIX_MAXVOLUME*volume);
 }
 
 

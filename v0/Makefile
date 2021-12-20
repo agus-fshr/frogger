@@ -6,8 +6,8 @@ cheatflags := -D CHEAT
 ifeq ($(machine), armv7l)
 	target = froggerRPi
 	maintarget = mainRPi.o
-	dep = LEDMatrixEngine.o LEDlib.o rpi_sound.o
-	linkedobj = $(dep) libs/joydisp/disdrv.o libs/joydisp/joydrv.o libs/audio/SDL2/libAudioSDL2.o
+	dep = LEDMatrixEngine.o LEDlib.o
+	linkedobj = $(dep) libs/joydisp/disdrv.o libs/joydisp/joydrv.o libs/audio/SDL2/libAudioSDL2.o -I/usr/local/include -L/usr/local/lib -lSDL2
 	flag = -D LEDMAT
 else 
 	target = froggerAllegro
@@ -38,7 +38,7 @@ AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/allegro_so
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
 	gcc -c objects/GameEngine.c -o GameEngine.o $(gccflags)
 
-LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h
+LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h libs/rpi_sound.h
 	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o $(gccflags)
 
 LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
@@ -48,7 +48,7 @@ allegro_sound.o: libs/allegro_sound.c libs/allegro_sound.h
 	gcc -c libs/allegro_sound.c -o allegro_sound.o $(gccflags)
 
 rpi_sound.o: libs/rpi_sound.c libs/rpi_sound.h libs/audio/SDL2/audio.h
-	gcc -c libs/rpi_sound.c -I/usr/local/include -L/usr/local/lib -lSDL2 -o rpi_sound.o $(gccflags)
+	gcc -c libs/rpi_sound.c -o rpi_sound.o $(gccflags)
 
 clean:
 	rm *.o

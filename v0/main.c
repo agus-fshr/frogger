@@ -32,11 +32,6 @@ int main()
     engine->destroy = DESTROY_FUN;
     
     engine_init_wrapper(engine);
-
-    #ifdef LEDMAT
-    sound_init();
-    sound_play(SFX_JINGLE, 1.0, 0);
-    #endif
     
     while(!engine->gameloop(engine)) {
         //game loop runs in while condition

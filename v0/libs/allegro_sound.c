@@ -13,11 +13,12 @@
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
-const char *sounds[] = {
+static const char *sounds[] = {
     "sfx/jingle.wav",
     "sfx/hop.wav",
     "sfx/squash.wav",
-    "sfx/plunk.wav"
+    "sfx/plunk.wav",
+    "sfx/ringtone.wav"
 };
 
 

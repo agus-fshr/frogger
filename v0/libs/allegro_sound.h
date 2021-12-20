@@ -23,7 +23,7 @@
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef enum {SFX_JINGLE = 0, SFX_HOP,SFX_SQUASH, SFX_PLUNK} soundfx_t;
+typedef enum {SFX_JINGLE = 0, SFX_HOP,SFX_SQUASH, SFX_PLUNK, SFX_RINGTONE} soundfx_t;
 
 
 /*******************************************************************************

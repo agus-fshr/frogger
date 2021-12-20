@@ -15,6 +15,7 @@
 #include "../libs/joydisp/joydrv.h"
 #include "../libs/joydisp/disdrv.h"
 #include "../libs/LEDlib.h"
+#include "../libs/audio/SDL2/audio.h"
 #include <unistd.h>
 
 

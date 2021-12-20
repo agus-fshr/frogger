@@ -38,7 +38,7 @@ static void show_menu_lives(uint8_t lives);
  ******************************************************************************/
 static dcoord_t dcoord;
 
-const dlevel_t arrow_up[BMP_WIDTH*BMP_HEIGHT] = {
+static const dlevel_t arrow_up[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_ON, D_OFF, D_OFF,
     D_OFF, D_ON, D_ON, D_ON, D_OFF,
     D_ON, D_ON, D_ON, D_ON, D_ON,
@@ -46,7 +46,7 @@ const dlevel_t arrow_up[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_OFF, D_OFF, D_OFF
 };
     
-const dlevel_t arrow_down[BMP_WIDTH*BMP_HEIGHT] = {
+static const dlevel_t arrow_down[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_OFF, D_OFF, D_OFF,
     D_OFF, D_OFF, D_OFF, D_OFF, D_OFF,
     D_ON, D_ON, D_ON, D_ON, D_ON,
@@ -54,6 +54,14 @@ const dlevel_t arrow_down[BMP_WIDTH*BMP_HEIGHT] = {
     D_OFF, D_OFF, D_ON, D_OFF, D_OFF
 };
 
+typedef enum {SFX_JINGLE = 0, SFX_HOP,SFX_SQUASH, SFX_PLUNK} soundfx_t;
+
+static const char *sounds[] = {
+    "sfx/jingle.wav",
+    "sfx/hop.wav",
+    "sfx/squash.wav",
+    "sfx/plunk.wav"
+};
 
 
 /*******************************************************************************
@@ -66,10 +74,13 @@ int LEDMatEngine_init(engineptr_t eng) {
     disp_init();
     dcoord.x = 0;
     dcoord.y = 0;
+    initAudio();
+    //playMusic(sounds[SFX_JINGLE], eng->volume*SDL_MIX_MAXVOLUME);
     return 1;
 }
 
 int LEDMatEngine_destroy(engineptr_t eng){
+    endAudio();
     return 1;
 }
 
@@ -77,7 +88,6 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     input_t system_input = LEDMatEngine_input(eng);
     
     process_game_state(eng, system_input);
-
 
     //LEDMatEngine_input(eng);
     LEDMatEngine_render(eng);
@@ -144,11 +154,7 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
         process_game_state(eng, INPUT_ENTER);
     }
     last_switch = sw;
-    /* NOT WORKING!
-    if(actual_input != INPUT_NULL && actual_input != INPUT_ENTER) {
-        //sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
-    }
-    */
+    
     if(coord.y > DEADZONE)
         actual_input = INPUT_UP;
     else if(coord.y < -DEADZONE)
@@ -161,6 +167,10 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
     if(sw != last_switch) {
         last_switch = sw;
         actual_input = sw == J_PRESS ? INPUT_ENTER : INPUT_NULL;
+    }
+    
+    if(actual_input != INPUT_NULL && actual_input != INPUT_ENTER) {
+        playSound(sounds[SFX_PLUNK], eng->volume*SDL_MIX_MAXVOLUME);
     }
 
     if(actual_input != last_input) {
