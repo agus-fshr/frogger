@@ -192,7 +192,7 @@ static void render_pause(engineptr_t eng) {
     ALLEGRO_FONT* font = al_create_builtin_font();
 
     bitmap = al_load_bitmap(GET_BMP(BMP_PAUSE_BG));
-    al_draw_scaled_bitmap(bitmap, 0, 0, 300, 300,
+    al_draw_scaled_bitmap(bitmap, 0, 0, 300, 300,   // image scaling
                 DISP_WIDTH/3, DISP_HEIGHT/3, 
                 DISP_WIDTH/3, DISP_HEIGHT/3, 0);
     al_destroy_bitmap(bitmap);
@@ -298,7 +298,6 @@ static void render_map(levelptr_t level) {
             render_floor_lane(level, i);
         }
 
-        
         if(lane->delta != 0) {
             for(p = -1; p < (LEVEL_WIDTH / lane->delta) + 2; p++) {
                 if(lane->type == MOB_CAR){
@@ -398,7 +397,7 @@ static void draw_log(laneptr_t lane, uint8_t lanenum, uint8_t p) {
             lanenum*BLOCK_HEIGHT, 0);
         al_destroy_bitmap(bitmap);
     } else {
-        // draws head, then mob_length-2 bodies, then foot
+        // draws head, then (mob_length - 2) bodies, then foot
         bitmap = al_load_bitmap(GET_BMP(BMP_LOG_HEAD));
         al_draw_bitmap(
             bitmap, 
@@ -438,7 +437,7 @@ static void draw_vehicle(laneptr_t lane, uint8_t lanenum, uint8_t p) {
             lane->step < 0 ? 0 : ALLEGRO_FLIP_HORIZONTAL);
         al_destroy_bitmap(bitmap);
     } else {
-        // draws initial mob sprite, then mob_length-1 secondary mob sprites
+        // draws initial mob sprite, then (mob_length - 1) secondary mob sprites
         // and orients based on movement direction
         if(lane->step > 0) {
             bitmap = al_load_bitmap(GET_BMP(BMP_CARRIAGE));

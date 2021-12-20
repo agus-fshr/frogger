@@ -183,40 +183,29 @@ static int8_t gen_sign() {
 }
 
 static void generate_car_lane(laneptr_t lane, uint8_t diff) {
-    // A lot of magic numbers ahead, these manage the difficulty settings
-    // and are more "feels like" than hard calculations. Modify and 
-    // compare to what you would like
-    // We did not have enough time to tidy this up to #defines, but that would be
-    // the correct course of action
     lane->ticks = 0;
     lane->type = MOB_CAR;
-    lane->step = gen_sign() * (2 + rand() % (5 + diff));
+    lane->step = gen_sign() * (MIN_VEHICLE_STEP + rand() % DIFF_SCALING_VEHICLE_STEP(diff));
     if(lane->step == 0) {
         lane->step = gen_sign();
     }
-    lane->mob_length = 1 + rand() % 3;
-    lane->delta = lane->mob_length + 2 + abs(lane->step)/10;
+    lane->mob_length = MIN_VEHICLE_LENGTH + rand() % MAX_VEHICLE_LENGTH;
+    lane->delta = MIN_DELTA(lane) + abs(lane->step)*VEHICLE_DELTA_PER_STEP;
     
-    if(diff < 10) 
-        lane->delta += (rand() % (20 - diff*2));
-    lane->x0 = 10*(rand() % 6);
+    if(diff < CUT_OFF_DIFFICULTY) 
+        lane->delta += (rand() % DIFF_SCALING_VEHICLE_DELTA(diff));
+    lane->x0 = rand() % ((uint16_t) REFERENCE_WIDTH);
 }
 
 static void generate_log_lane(laneptr_t lane, uint8_t diff) {  
-    // A lot of magic numbers ahead, these manage the difficulty settings
-    // and are more "feels like" than hard calculations. Modify and 
-    // compare to what you would like  
-    // We did not have enough time to tidy this up to #defines, but that would be
-    // the correct course of action
     lane->ticks = 0;
     lane->type = MOB_LOG;
-    lane->step = gen_sign() * (1 + rand() % (8+diff));
+    lane->step = gen_sign() * (MIN_LOG_STEP + rand() % DIFF_SCALING_LOG_STEP(diff));
+    lane->mob_length = MIN_LOG_LENGTH;
+    if(diff < CUT_OFF_DIFFICULTY)
+         lane->mob_length += (rand() % ((MAX_LOG_LENGTH - MIN_LOG_LENGTH) + DIFF_SCALING_LOG_LENGTH(diff)));
 
-    if(diff < 15)
-        lane->mob_length = 2 + (rand() % (5 - (diff/3)));
-    else
-        lane->mob_length = 2;
-    lane->delta = lane->mob_length + 2 + (rand() % 4);
+    lane->delta = MIN_DELTA(lane) + (rand() % MAX_LOG_EXTRA_DELTA);
     lane->x0 = rand() % ((uint16_t) REFERENCE_WIDTH);
 }
 
@@ -225,7 +214,7 @@ static void generate_floor_lane(laneptr_t lane) {
     lane->type = MOB_FLOOR;
     lane->step = 0;
     lane->mob_length = 0;
-    lane->delta = 1;
+    lane->delta = 1;    // To prevent errors
     lane->x0 = 0;
 }
 
@@ -233,15 +222,16 @@ static void generate_floor_lane(laneptr_t lane) {
 static void Level_generate(levelptr_t level) {
     uint8_t i = 0;
     for(i = 0; i < LEVEL_HEIGHT; i++) {
-        if(i == 0) {
-            level->lanes[0]->type = MOB_FINISH;
-            level->lanes[0]->delta = LEVEL_WIDTH/LVL_FINISHSPOTS;
-            level->lanes[0]->step = 0;
-            level->lanes[0]->x0 = REFERENCE_WIDTH * (level->lanes[0]->delta / 2);
-            level->lanes[0]->mob_length = 1;
-        } else if(i == 8 || i == 15) {
+        if(i == FINISH_LANE) {
+            level->lanes[FINISH_LANE]->type = MOB_FINISH;
+            level->lanes[FINISH_LANE]->delta = LEVEL_WIDTH/LVL_FINISHSPOTS;
+            level->lanes[FINISH_LANE]->step = 0;
+            // The next line tries to center the objective pads
+            level->lanes[FINISH_LANE]->x0 = REFERENCE_WIDTH * (level->lanes[FINISH_LANE]->delta / 2);
+            level->lanes[FINISH_LANE]->mob_length = 1;
+        } else if(i == START_LANE || i == REST_LANE) {
             generate_floor_lane(level->lanes[i]);
-        }else if(i < 8){
+        }else if(i < REST_LANE){
             generate_log_lane(level->lanes[i], level->number);
         } else {
             generate_car_lane(level->lanes[i], level->number);

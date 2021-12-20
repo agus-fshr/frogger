@@ -23,6 +23,31 @@
 #define SPAWN_X (LEVEL_WIDTH*REFERENCE_WIDTH/2)
 #define SPAWN_Y (LEVEL_HEIGHT-1)
 
+#define START_LANE (SPAWN_Y)
+#define REST_LANE (8)
+#define FINISH_LANE (0)
+
+
+
+/** DIFFICULTY SETTINGS **/
+
+#define CUT_OFF_DIFFICULTY    (15)
+#define MIN_DELTA(lane)       ((lane)->mob_length + 2)
+
+#define MAX_VEHICLE_LENGTH    (3)
+#define MIN_VEHICLE_LENGTH    (1)
+#define VEHICLE_DELTA_PER_STEP (0.1)
+#define MIN_VEHICLE_STEP      (2)
+#define DIFF_SCALING_VEHICLE_DELTA(d) (2*(CUT_OFF_DIFFICULTY - (d)))
+#define DIFF_SCALING_VEHICLE_STEP(d)  (5+(d))
+
+#define MIN_LOG_LENGTH    (2)
+#define MAX_LOG_LENGTH    (7)
+#define MAX_LOG_EXTRA_DELTA (4)
+#define MIN_LOG_STEP      (1)
+#define DIFF_SCALING_LOG_LENGTH(d)  (-(d)/3)
+#define DIFF_SCALING_LOG_STEP(d)    (8+(d))
+
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
