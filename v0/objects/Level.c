@@ -129,7 +129,7 @@ void Level_next(levelptr_t level) {
     Frog_reset_lives(level->frog);
     Frog_move(level->frog, SPAWN_X, SPAWN_Y);
     for(i = 0; i < LVL_FINISHSPOTS; i++) {
-        level->finishers[i] = -10;
+        level->finishers[i] = OUT_OF_BOUNDS;
     }
 }
 

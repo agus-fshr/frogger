@@ -27,6 +27,8 @@
 #define REST_LANE (8)
 #define FINISH_LANE (0)
 
+#define OUT_OF_BOUNDS (-10)   // For placing in finishers array
+
 
 
 /** DIFFICULTY SETTINGS **/
