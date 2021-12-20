@@ -69,7 +69,7 @@ int AllegroEngine_init(engineptr_t eng) {
     
     al_start_timer(timer);
 
-    sound_play(SFX_JINGLE, eng->volume, ALLEGRO_PLAYMODE_LOOP, &background_music);
+    sound_play(SFX_JINGLE, eng->volume, 0.7, ALLEGRO_PLAYMODE_LOOP, &background_music);
     return 1;
 }
 
@@ -88,20 +88,27 @@ int AllegroEngine_destroy(engineptr_t eng){
 
 int AllegroEngine_gameloop(engineptr_t eng) {
     static ALLEGRO_EVENT event;
-    gamestate_t prevstate = eng->state;
+    gamestate_t prevstate;
 
     al_wait_for_event(queue, &event);
     switch(event.type) {
         case ALLEGRO_EVENT_TIMER:
-            prevstate = process_game_state(eng, INPUT_NULL);
-            if(eng->state == GAME_STA_DEATH && prevstate != GAME_STA_DEATH)
-                sound_play(SFX_RINGTONE, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
-            
+            prevstate = eng->state;
+            process_game_state(eng, INPUT_NULL);
+            /*
+            if((eng->state == GAME_STA_DEATH) && (prevstate != GAME_STA_DEATH)){
+                //al_stop_samples();
+                al_stop_sample(&background_music);
+                
+                sound_play(SFX_RINGTONE, eng->volume, 0.5, ALLEGRO_PLAYMODE_ONCE, &background_music);
+            }
+            */
             if(eng->state == GAME_STA_EXIT) {
                 return 1;
             }
             ALLEGRO_SAMPLE_INSTANCE* bgmusic_ins = al_lock_sample_id(&background_music);
             al_set_sample_instance_gain(bgmusic_ins, eng->volume);
+            al_set_sample_instance_speed(bgmusic_ins, SOUND_SPEED_INITIAL + eng->level->number*SOUND_SPEED_PER_LVL);
             al_unlock_sample_id(&background_music);
             
             break;
@@ -178,7 +185,7 @@ static input_t AllegroEngine_input(engineptr_t eng, int key) {
             key == ALLEGRO_KEY_DOWN ||
             key == ALLEGRO_KEY_LEFT || 
             key == ALLEGRO_KEY_RIGHT) {
-        sound_play(SFX_HOP, eng->volume, ALLEGRO_PLAYMODE_ONCE, NULL);
+        sound_play(SFX_HOP, eng->volume, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
     if(key == ALLEGRO_KEY_UP) return INPUT_UP;
     if(key == ALLEGRO_KEY_DOWN) return INPUT_DOWN;
@@ -338,9 +345,11 @@ static void render_map(levelptr_t level) {
 // shows score in bottom-left corner of the screen
 static void draw_score(uint32_t score) {
     ALLEGRO_FONT* font = al_create_builtin_font();
-
+    ALLEGRO_COLOR color;
+    if(score >= get_highscore()) color = al_map_rgb(255,50,50); //red, above highscore
+    else color = al_map_rgb(0,0,0); // black, below highscore
     font = al_load_ttf_font(SELECTED_FONT, 28, 0);  //fontisze:28
-    al_draw_textf(font,al_map_rgb(0,0,0), // black
+    al_draw_textf(font,color,
         BLOCK_WIDTH/2,
         (LEVEL_HEIGHT-0.5)*BLOCK_HEIGHT,
         0,"SCORE: %d", score);

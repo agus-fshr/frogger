@@ -27,6 +27,10 @@
 #define DISP_HEIGHT (BLOCK_HEIGHT * LEVEL_HEIGHT)
 #define DISP_WIDTH (BLOCK_WIDTH * LEVEL_WIDTH)
 
+
+#define SOUND_SPEED_INITIAL (0.8)
+#define SOUND_SPEED_PER_LVL (0.1)
+
 #define SELECTED_FONT "fonts/Gamer.ttf"
 
 #define BMP_FOLDER "sprites/"

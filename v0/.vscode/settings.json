@@ -21,6 +21,7 @@
         "disdrv.h": "c",
         "joydrv.h": "c",
         "ledlib.h": "c",
-        "rpi_sound.h": "c"
+        "rpi_sound.h": "c",
+        "allegro_sound.h": "c"
     }
 }

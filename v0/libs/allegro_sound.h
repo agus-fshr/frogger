@@ -41,7 +41,7 @@ void sound_init(void);
  * @param mode Loop or once
  * @param ret_id To save reproduction id
 */
-void sound_play(soundfx_t sfx, float volume, ALLEGRO_PLAYMODE mode, ALLEGRO_SAMPLE_ID* ret_id);
+void sound_play(soundfx_t sfx, float volume, float speed, ALLEGRO_PLAYMODE mode, ALLEGRO_SAMPLE_ID* ret_id);
 
 /**
  * @brief Destroys sound module

@@ -34,10 +34,10 @@ void sound_init(void) {
 }
 
 
-void sound_play(soundfx_t sfx, float volume, ALLEGRO_PLAYMODE mode, ALLEGRO_SAMPLE_ID* ret_id) {
+void sound_play(soundfx_t sfx, float volume, float speed, ALLEGRO_PLAYMODE mode, ALLEGRO_SAMPLE_ID* ret_id) {
     ALLEGRO_SAMPLE *sample = al_load_sample(sounds[sfx]);
     if(sample) {
-        al_play_sample(sample, volume, 0.0, 1.0, mode, 0); // no extra gain nor speeding up.
+        al_play_sample(sample, volume, 0.0, speed, mode, 0); // no extra gain nor speeding up.
     }
     // al_destroy_sample(sample);
     // Leak!
