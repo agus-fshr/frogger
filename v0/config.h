@@ -11,6 +11,7 @@
 #define SCORE_MULT  100
 
 #define TIMEBASE (1.0 / 30.0)
+#define US_PER_SECOND (1000000)
 
 #define ALLEGRO_UNSTABLE
 

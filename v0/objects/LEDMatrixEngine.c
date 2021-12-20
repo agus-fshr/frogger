@@ -97,7 +97,7 @@ int LEDMatEngine_gameloop(engineptr_t eng) {
     }
 
     //printf("%d\n", eng->score);
-    usleep(1000000*TIMEBASE);
+    usleep(US_PER_SECOND*TIMEBASE);
     
     return 0;
 }
