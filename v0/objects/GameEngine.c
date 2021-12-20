@@ -96,7 +96,7 @@ float scale_width(int16_t width, int16_t block_width) {
 
 uint32_t get_highscore() {
     uint32_t highscore = 0;
-    fseek(highscorefile, 0, SEEK_SET);
+    fseek(highscorefile, 0, SEEK_SET);  //go to start of file
     fread(&highscore, sizeof(uint32_t), 1, highscorefile);
     return highscore;
 }
@@ -218,6 +218,7 @@ static void process_play_state(engineptr_t eng, input_t input) {
 
     laneptr_t lane = eng->level->lanes[eng->level->frog->lane];
 
+    /*** displace frog with log lane ***/
     if(lane->type == MOB_LOG) {
         int16_t newx = eng->level->frog->x + lane->step;
         if((newx > 0) && (newx+REFERENCE_WIDTH < REFERENCE_WIDTH*LEVEL_WIDTH)) {
@@ -229,16 +230,14 @@ static void process_play_state(engineptr_t eng, input_t input) {
     }
     uint16_t extra_score;
     Level_process_collisions(eng->level, &extra_score);
-    eng->score += extra_score;
-    manage_score(eng);
+    eng->score += extra_score;  // update score
+    manage_score(eng);  // check highscore
 
     switch(input) {
         case INPUT_UP:
             if(eng->level->frog->lane >= 1)
                 eng->level->frog->lane -= 1;
             eng->level->frog->movement = MOVE_UP;
-            //if(eng->pausestate == PAUSE_STA_OP_2) eng->pausestate = PAUSE_STA_OP_1;
-            //else if(eng->pausestate == PAUSE_STA_OP_3) eng->pausestate = PAUSE_STA_OP_2;
             break;
         
         case INPUT_DOWN:
@@ -251,8 +250,6 @@ static void process_play_state(engineptr_t eng, input_t input) {
             if(eng->level->frog->x >= REFERENCE_WIDTH)
                 eng->level->frog->x -= REFERENCE_WIDTH;
             eng->level->frog->movement = MOVE_LEFT;
-            //eng->volume -= 0.1f;
-            //if(eng->volume < 0) eng->volume = 0.0f;
             break;
 
 
@@ -260,8 +257,6 @@ static void process_play_state(engineptr_t eng, input_t input) {
             if(eng->level->frog->x < (LEVEL_WIDTH-1)*REFERENCE_WIDTH)
                 eng->level->frog->x += REFERENCE_WIDTH;
             eng->level->frog->movement = MOVE_RIGHT;
-            //eng->volume += 0.1f;
-            //if(eng->volume > 0) eng->volume = 1.0f;
             break;
 
         case INPUT_ENTER:
@@ -278,8 +273,8 @@ static void process_play_state(engineptr_t eng, input_t input) {
 static void manage_score(engineptr_t eng) {
     uint32_t highscore = get_highscore();
     if(eng->score > highscore) {
-        fseek(highscorefile, 0, SEEK_SET);
-        fwrite(&eng->score, sizeof(uint32_t), 1, highscorefile);
-        fflush(highscorefile);
+        fseek(highscorefile, 0, SEEK_SET);  // go to file start
+        fwrite(&eng->score, sizeof(uint32_t), 1, highscorefile); // rewrite
+        fflush(highscorefile);  //flush
     }
 }

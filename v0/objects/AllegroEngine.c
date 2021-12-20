@@ -69,13 +69,12 @@ int AllegroEngine_init(engineptr_t eng) {
     
     al_start_timer(timer);
 
-    sound_play(SFX_JINGLE, eng->volume, 0.7, ALLEGRO_PLAYMODE_LOOP, &background_music);
+    sound_play(SFX_JINGLE, eng->volume, SOUND_SPEED_INITIAL, ALLEGRO_PLAYMODE_LOOP, &background_music);
     return 1;
 }
 
 
 int AllegroEngine_destroy(engineptr_t eng){
-    //al_destroy_bitmap(bitmap);
     al_destroy_display(disp);
     sound_destroy();
     al_shutdown_ttf_addon();
@@ -142,7 +141,7 @@ static void AllegroEngine_render(engineptr_t eng) {
 
         case GAME_STA_PLAY:
             render_map(eng->level);
-            draw_score(eng->score * 100);
+            draw_score(eng->score);
             break;
         
         case GAME_STA_PAUSE:
@@ -219,7 +218,7 @@ static void render_pause(engineptr_t eng) {
         eng->pausestate==PAUSE_STA_OP_1 ? OPTION_SELECTED : OPTION_UNSELECTED,
         eng->pausestate==PAUSE_STA_OP_2 ? OPTION_SELECTED : OPTION_UNSELECTED,
         eng->pausestate==PAUSE_STA_OP_3 ? OPTION_SELECTED : OPTION_UNSELECTED,
-        get_highscore()*HIGHSCORE_MULT
+        get_highscore()*SCORE_MULT
     );
     al_destroy_font(font);
     
@@ -259,7 +258,7 @@ static void render_menu(engineptr_t eng) {
         "\n \n MAIN MENU \n \n \n %c   PLAY     \n \n %c   QUIT     \n \n \n \n HIGH SCORE: %d", 
         eng->menustate==MENU_STA_OP_1 ? OPTION_SELECTED : OPTION_UNSELECTED,
         eng->menustate==MENU_STA_OP_2 ? OPTION_SELECTED : OPTION_UNSELECTED,
-        get_highscore()*HIGHSCORE_MULT
+        get_highscore()*SCORE_MULT
     );
     al_destroy_font(font);
 }
@@ -287,7 +286,7 @@ static void render_death(engineptr_t eng) {
         "\n      GAME OVER      \n \n  %c  TRY AGAIN      \n     %c  QUIT        \n \n \n    HIGH SCORE: %d    ", 
         eng->deathstate==DEATH_STA_MENU_OP_1 ? OPTION_SELECTED : OPTION_UNSELECTED,
         eng->deathstate==DEATH_STA_MENU_OP_2 ? OPTION_SELECTED : OPTION_UNSELECTED,
-        get_highscore()*HIGHSCORE_MULT
+        get_highscore()*SCORE_MULT
     );
     al_destroy_font(font);
 }
@@ -344,15 +343,14 @@ static void render_map(levelptr_t level) {
 
 // shows score in bottom-left corner of the screen
 static void draw_score(uint32_t score) {
-    ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_COLOR color;
     if(score >= get_highscore()) color = al_map_rgb(255,50,50); //red, above highscore
     else color = al_map_rgb(0,0,0); // black, below highscore
-    font = al_load_ttf_font(SELECTED_FONT, 28, 0);  //fontisze:28
+    ALLEGRO_FONT* font = al_load_ttf_font(SELECTED_FONT, 48, 0);  //fontisze:36
     al_draw_textf(font,color,
         BLOCK_WIDTH/2,
-        (LEVEL_HEIGHT-0.5)*BLOCK_HEIGHT,
-        0,"SCORE: %d", score);
+        (LEVEL_HEIGHT-0.75)*BLOCK_HEIGHT,
+        0,"SCORE: %d", score*SCORE_MULT);
     al_destroy_font(font);
 }
 

@@ -8,7 +8,7 @@
 #define LEVEL_WIDTH     16
 #define LVL_FINISHSPOTS 4
 #define LVL_LIVES       3
-#define HIGHSCORE_MULT  100
+#define SCORE_MULT  100
 
 #define TIMEBASE (1.0 / 30.0)
 

@@ -48,7 +48,7 @@
 #define MIN_LOG_LENGTH    (2)
 #define MAX_LOG_LENGTH    (7)
 #define MAX_LOG_EXTRA_DELTA (4)
-#define MIN_LOG_STEP      (2)
+#define MIN_LOG_STEP      (3)
 #define DIFF_SCALING_LOG_LENGTH(d)  (MAX_LOG_LENGTH - MIN_LOG_LENGTH - (d)/3)
 #define DIFF_SCALING_LOG_STEP(d)    (8 + (d))
 
