@@ -38,7 +38,7 @@ AllegroEngine.o: objects/AllegroEngine.c objects/AllegroEngine.h libs/allegro_so
 GameEngine.o: objects/GameEngine.c objects/GameEngine.h
 	gcc -c objects/GameEngine.c -o GameEngine.o $(gccflags)
 
-LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h libs/rpi_sound.h
+LEDMatrixEngine.o: objects/LEDMatrixEngine.c objects/LEDMatrixEngine.h objects/GameEngine.h libs/LEDlib.h
 	gcc -c objects/LEDMatrixEngine.c -o LEDMatrixEngine.o $(gccflags)
 
 LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
@@ -47,8 +47,6 @@ LEDlib.o: libs/LEDlib.c libs/LEDlib.h libs/joydisp/disdrv.h
 allegro_sound.o: libs/allegro_sound.c libs/allegro_sound.h
 	gcc -c libs/allegro_sound.c -o allegro_sound.o $(gccflags)
 
-rpi_sound.o: libs/rpi_sound.c libs/rpi_sound.h libs/audio/SDL2/audio.h
-	gcc -c libs/rpi_sound.c -o rpi_sound.o $(gccflags)
 
 clean:
 	rm *.o

@@ -5,7 +5,6 @@
 
 #ifdef LEDMAT
     #include "objects/LEDMatrixEngine.h"
-    #include "libs/rpi_sound.h"
     #define INIT_FUN (&LEDMatEngine_init)
     #define GAME_FUN (&LEDMatEngine_gameloop)
     #define DESTROY_FUN (&LEDMatEngine_destroy)

@@ -75,7 +75,7 @@ int LEDMatEngine_init(engineptr_t eng) {
     dcoord.x = 0;
     dcoord.y = 0;
     initAudio();
-    //playMusic(sounds[SFX_JINGLE], eng->volume*SDL_MIX_MAXVOLUME);
+    playMusic(sounds[SFX_JINGLE], eng->volume*SDL_MIX_MAXVOLUME);
     return 1;
 }
 
@@ -170,7 +170,7 @@ static input_t LEDMatEngine_input(engineptr_t eng) {
     }
     
     if(actual_input != INPUT_NULL && actual_input != INPUT_ENTER) {
-        playSound(sounds[SFX_PLUNK], eng->volume*SDL_MIX_MAXVOLUME);
+        playSound(sounds[SFX_HOP], eng->volume*SDL_MIX_MAXVOLUME); //this should work!
     }
 
     if(actual_input != last_input) {
@@ -210,9 +210,6 @@ static void render_menu(engineptr_t eng) {
 
     draw_menu_arrows();
     show_menu_score(get_highscore());
-    
-    //disp_write_sanitized(dcoord, D_ON);
-    //write_letter('E', dcoord);
 }
 
 
